@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: ../Dockerfile
+    container_name: diskentulho_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=DiskEntulhoDB;User Id=sa;Password=DiskEntulho@123;TrustServerCertificate=True;
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: diskentulho_db
+    environment:
+      SA_PASSWORD: "DiskEntulho@123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+
