@@ -164,3 +164,7 @@ C:\Users\erica\faculdade\diskentulho_pi4\backend\bin\Debug\net9.0\runtimes\win\l
 C:\Users\erica\faculdade\diskentulho_pi4\backend\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\erica\faculdade\diskentulho_pi4\backend\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\erica\faculdade\diskentulho_pi4\backend\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\Users\erica\faculdade\diskentulho_pi4\Backend\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\erica\faculdade\diskentulho_pi4\Backend\bin\Debug\net9.0\Scrutor.dll
+C:\Users\erica\faculdade\diskentulho_pi4\Backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\erica\faculdade\diskentulho_pi4\Backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll
