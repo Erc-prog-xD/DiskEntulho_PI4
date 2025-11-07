@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Backend.Models;
-using Backend.Services.AuthService;
+
+using Backend.Dto;
+using Backend.Services.AgendamentoService;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -15,7 +16,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("CadastrarAgendamento")]
-        public async Task<ActionResult> CadastrarAgendamento(Agendamento agendamentoBody)
+        public async Task<ActionResult> CadastrarAgendamento(AgendamentoDTO agendamentoBody)
         {
             var response = await _agendamentoService.Cadastrar(agendamentoBody);
             return Ok(response);

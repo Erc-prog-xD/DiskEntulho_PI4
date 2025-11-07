@@ -1,8 +1,8 @@
 using Backend.Data;
+using Backend.Dto;
 using Backend.Models;
-using Backend.Services.SenhaService;
 
-namespace Backend.Services.AuthService
+namespace Backend.Services.AgendamentoService
 {
     public class AgendamentoService : Agendamento
     {
@@ -11,9 +11,9 @@ namespace Backend.Services.AuthService
         {
             _context = context;
         }
-        public async Task<Response<Agendamento>> Cadastrar(Agendamento agendamento)
+        public async Task<Response<AgendamentoDTO>> Cadastrar(AgendamentoDTO agendamento)
         {
-            Response<Agendamento> response = new Response<Agendamento>();
+            Response<AgendamentoDTO> response = new Response<AgendamentoDTO>();
             response.Mensage = "Agendamento cadastrado";
             response.Status = true;
             response.Dados = agendamento;
