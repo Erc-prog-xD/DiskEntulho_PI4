@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\backend\\Backend.csproj": {}
+    "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\BackEnd\\Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\backend\\Backend.csproj": {
+    "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\BackEnd\\Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\backend\\Backend.csproj",
+        "projectUniqueName": "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\BackEnd\\Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\backend\\Backend.csproj",
+        "projectPath": "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\BackEnd\\Backend.csproj",
         "packagesPath": "C:\\Users\\erica\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\backend\\obj\\",
+        "outputPath": "C:\\Users\\erica\\faculdade\\diskentulho_pi4\\BackEnd\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\erica\\AppData\\Roaming\\NuGet\\NuGet.Config"

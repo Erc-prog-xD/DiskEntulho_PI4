@@ -22,6 +22,77 @@ namespace Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Backend.Models.Agendamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CacambaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("Coord_X")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Coord_Y")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataFinal")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataInicial")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PagamentoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatusAgendamento")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CacambaId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("PagamentoId");
+
+                    b.ToTable("Agendamento");
+                });
+
+            modelBuilder.Entity("Backend.Models.Cacamba", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StatusCacamba")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cacamba");
+                });
+
             modelBuilder.Entity("Backend.Models.Client", b =>
                 {
                     b.Property<int>("Id")
@@ -34,7 +105,10 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -59,6 +133,99 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Client");
+                });
+
+            modelBuilder.Entity("Backend.Models.Pagamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StatusPagemento")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TipoPagemento")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Valor")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pagamento");
+                });
+
+            modelBuilder.Entity("Backend.Models.Agendamento", b =>
+                {
+                    b.HasOne("Backend.Models.Cacamba", "Cacamba")
+                        .WithMany()
+                        .HasForeignKey("CacambaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Pagamento", "Pagamento")
+                        .WithMany()
+                        .HasForeignKey("PagamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Backend.Models.Endereco", "Endereco", b1 =>
+                        {
+                            b1.Property<int>("AgendamentoId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Bairro")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Cidade")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("DescricaoLocal")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Estado")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Referencia")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Rua")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("AgendamentoId");
+
+                            b1.ToTable("Agendamento");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AgendamentoId");
+                        });
+
+                    b.Navigation("Cacamba");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Endereco")
+                        .IsRequired();
+
+                    b.Navigation("Pagamento");
                 });
 #pragma warning restore 612, 618
         }

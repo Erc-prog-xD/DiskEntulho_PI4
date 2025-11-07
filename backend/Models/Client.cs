@@ -1,3 +1,4 @@
+
 namespace Backend.Models
 {
     public class Client
@@ -9,6 +10,8 @@ namespace Backend.Models
         public required byte[] PasswordHash { get; set; }
         public required byte[] PasswordSalt { get; set; }
         public bool isAdmin { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime? DeletionDate { get; set; } = null;
+
     }
 }

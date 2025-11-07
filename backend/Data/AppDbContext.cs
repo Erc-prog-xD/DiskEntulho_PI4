@@ -1,3 +1,4 @@
+using Backend.Enum;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,17 @@ namespace Backend.Data
         {
         }
         public DbSet<Client> Client { get; set; }
-       
+        public DbSet<Pagamento> Pagamento { get; set; }
+        public DbSet<Cacamba> Cacamba { get; set; }
+        public DbSet<Agendamento> Agendamento { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // 🔹 Diz ao EF que Endereco faz parte de Agendamento
+            modelBuilder.Entity<Agendamento>().OwnsOne(a => a.Endereco);
+
+        }
     }
 }

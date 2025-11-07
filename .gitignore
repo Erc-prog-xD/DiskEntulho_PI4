@@ -1,0 +1,17 @@
+# Ignorar diretórios de build
+bin/
+obj/
+
+# Ignorar migrações do Entity Framework
+Migrations/
+migrations/
+
+# Outros arquivos e pastas comuns que não devem ir pro GitHub
+*.user
+*.suo
+*.cache
+*.log
+*.db
+*.sqlite
+*.swp
+*.vscode/

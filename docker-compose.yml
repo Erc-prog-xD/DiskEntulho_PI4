@@ -3,8 +3,8 @@ version: '3.9'
 services:
   api:
     build:
-      context: ./backend
-      dockerfile: ../Dockerfile
+      context: ./Backend
+      dockerfile: Dockerfile
     container_name: diskentulho_api
     ports:
       - "8080:8080"
