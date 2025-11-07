@@ -1,7 +1,8 @@
 # Ignorar diretórios de build
 bin/
 obj/
-
+Debug/
+Release/
 # Ignorar migrações do Entity Framework
 Migrations/
 migrations/
