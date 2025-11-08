@@ -6,7 +6,6 @@ namespace Backend.Models {
     public double? Coord_Y { get; set; }
     public required Endereco Endereco { get; set; }
     public required Cacamba Cacamba { get; set; }
-    public required Client Client { get; set; }
     public Pagamento? Pagamento { get; set; }
     public AgendamentoStatus StatusAgendamento { get; set; } = AgendamentoStatus.Criado;
     public DateTime CreationDate { get; set; } = DateTime.Now;

@@ -17,12 +17,6 @@ namespace Backend.Dto
         [Required(ErrorMessage = "O CacambaId é obrigatório.")]
         public required int CacambaId { get; set; }
 
-        [Required(ErrorMessage = "O ClientId é obrigatório.")]
-        public required int ClientId { get; set; }
-
-        // Pagamento pode ser nulo (somente após a confirmação do agendamento)
-        public int? PagamentoId { get; set; }
-
         // Status do agendamento (enum)
         public AgendamentoStatus StatusAgendamento { get; set; } = AgendamentoStatus.Criado;
 
