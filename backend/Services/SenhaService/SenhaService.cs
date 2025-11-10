@@ -33,12 +33,13 @@ namespace Backend.Services.SenhaService
 
         public string CriarToken(Client client)
         {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim("Nome", client.Name.ToString()),
-                new Claim("Cpf", client.Cpf.ToString())
-          
-            };
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, client.Name ?? ""),
+                    new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()),
+                    new Claim("Cpf", client.Cpf ?? "")
+                };
+
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
             
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
