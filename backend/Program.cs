@@ -12,9 +12,9 @@ using Backend.Services.CacambaService;
 using Backend.Services.AgendamentoService;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllers();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,9 +31,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 }
 );
 
-
 builder.Services.AddSwaggerGen(options =>
-{
+{   
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Autorização via Bearer {token}, coloque nesse formato: Bearer {token}",
@@ -60,7 +59,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 var app = builder.Build();
 
 // Configura o pipeline HTTP
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+if (app.Environment.IsDevelopment() )
 {
     app.UseSwagger();
     app.UseSwaggerUI();

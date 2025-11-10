@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
@@ -7,10 +8,12 @@ namespace Backend.Services.AgendamentoService
     public class AgendamentoService : IAgendamentoInterface
     {
         private readonly AppDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AgendamentoService(AppDbContext context)
+        public AgendamentoService(AppDbContext context,  IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<Response<Agendamento>> CadastrarAgendamento(AgendamentoDTO agendamento)
         {
@@ -42,12 +45,33 @@ namespace Backend.Services.AgendamentoService
                     return response;
                 }
 
+                var clientIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (clientIdClaim == null)
+                {
+                    response.Status = false;
+                    response.Mensage = "Usuário não autenticado.";
+                    return response;
+                }
+
+                int clientId = int.Parse(clientIdClaim);
+
+                // 🔹 Busca o cliente no banco
+                var client = await _context.Client.FindAsync(clientId);
+                if (client == null)
+                {
+                    response.Status = false;
+                    response.Mensage = "Cliente não encontrado.";
+                    return response;
+                }
+
                 // Cria uma nova instância da entidade Agendamento com base no DTO
                 var novoAgendamento = new Agendamento
                 {
                     Coord_X = agendamento.Coord_X,
                     Coord_Y = agendamento.Coord_Y,
                     Endereco = agendamento.Endereco,
+                    Client = client,
                     Cacamba = cacamba,
                     DataInicial = agendamento.DataInicial,
                     DataFinal = agendamento.DataFinal
@@ -71,6 +95,6 @@ namespace Backend.Services.AgendamentoService
             return response;
         }
 
-
+        
     }
 }
