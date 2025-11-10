@@ -8,9 +8,9 @@ namespace Backend.Controllers
     [ApiController]
     public class AgendamentoController : ControllerBase
     {
-        private readonly AgendamentoService _agendamentoService;
+        private readonly IAgendamentoInterface _agendamentoService;
 
-        public AgendamentoController(AgendamentoService agendamentoService)
+        public AgendamentoController(IAgendamentoInterface agendamentoService)
         {
             _agendamentoService = agendamentoService;
         }
@@ -18,7 +18,7 @@ namespace Backend.Controllers
         [HttpPost("CadastrarAgendamento")]
         public async Task<ActionResult> CadastrarAgendamento(AgendamentoDTO agendamentoBody)
         {
-            var response = await _agendamentoService.Cadastrar(agendamentoBody);
+            var response = await _agendamentoService.CadastrarAgendamento(agendamentoBody);
             return Ok(response);
         }
 

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Backend.Services.CacambaService;
+using Backend.Services.AgendamentoService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAuthInterface, AuthService>();
 builder.Services.AddScoped<ISenhaInterface, SenhaService>();
+builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
+builder.Services.AddScoped<CacambaService>();
+
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
