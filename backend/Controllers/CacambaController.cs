@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Backend.Services.CacambaService;
+using Backend.Dto;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -15,9 +16,9 @@ namespace Backend.Controllers
         }
 
         [HttpPost("CadastrarCacamba")]
-        public async Task<ActionResult> CadastrarCacamba()
+        public async Task<ActionResult> CadastrarCacamba(CacambaDTO body)
         {
-            var response = await _cacambaService.Cadastrar();
+            var response = await _cacambaService.Cadastrar(body);
             return Ok(response);
         }
 

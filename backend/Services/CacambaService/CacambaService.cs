@@ -11,25 +11,31 @@ namespace Backend.Services.CacambaService
         {
             _context = context;
         }
-        public async Task<Response<Cacamba>> Cadastrar()
+        public async Task<Response<Cacamba>> Cadastrar(CacambaDTO body)
         {
-            Response<Cacamba> response = new Response<Cacamba>();
-            Cacamba cacamba = new Cacamba();
+         Response<Cacamba> response = new Response<Cacamba>();
 
-            try
+        try
+        {
+            Cacamba cacamba = new Cacamba
             {
-                response.Mensage = "Caçamba cadastrada";
-                response.Status = true;
-                response.Dados = cacamba;
-                _context.Add(cacamba);
-                await _context.SaveChangesAsync();
+                Tamanho = body.Tamanho
+            };
+
+            _context.Cacamba.Add(cacamba); 
+            await _context.SaveChangesAsync();
+
+            response.Mensage = "Caçamba cadastrada com sucesso";
+            response.Status = true;
+            response.Dados = cacamba;
             }
-            catch 
+            catch (Exception ex)
             {
-                response.Mensage = "Falha no cadastrado da caçamba";
+                response.Mensage = "Falha no cadastro da caçamba: " + ex.Message;
                 response.Status = false;
                 response.Dados = null;
             }
+
             return response;
         }
 
