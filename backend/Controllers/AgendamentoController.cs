@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Dto;
 using Backend.Services.AgendamentoService;
 using Microsoft.AspNetCore.Authorization;
+using Backend.Models;
 namespace Backend.Controllers
 {
     [ApiController]
@@ -23,5 +24,14 @@ namespace Backend.Controllers
             var response = await _agendamentoService.CadastrarAgendamento(agendamentoBody);
             return Ok(response);
         }
+
+        [Authorize]
+        [HttpPost("AddPagamento")]
+        public async Task<ActionResult> AdicionarPagamento(AddPagementoDTO pagamento)
+        {
+            var response = await _agendamentoService.AdicionarPagamento(pagamento);
+            return Ok(response);
+        }
+       
     }
 }

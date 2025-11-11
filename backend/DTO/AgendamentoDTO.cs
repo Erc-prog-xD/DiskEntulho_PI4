@@ -10,17 +10,14 @@ namespace Backend.Dto
         // Coordenadas opcionais
         public double? Coord_X { get; set; }
         public double? Coord_Y { get; set; }
-
         public required Endereco Endereco { get; set; }
 
-        // IDs das entidades relacionadas
         [Required(ErrorMessage = "O CacambaId é obrigatório.")]
         public required int CacambaId { get; set; }
 
-        // Datas obrigatórias
         [Required(ErrorMessage = "A DataInicial é obrigatória.")]
         public required DateTime DataInicial { get; set; }
-
+        
         [Required(ErrorMessage = "A DataFinal é obrigatória.")]
         public required DateTime DataFinal { get; set; }
     }

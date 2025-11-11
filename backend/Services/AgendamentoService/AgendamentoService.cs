@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.AgendamentoService
 {
@@ -21,7 +22,7 @@ namespace Backend.Services.AgendamentoService
             try
             {
 
-                   // 🔹 Verificação de datas
+                // 🔹 Verificação de datas
                 if (agendamento.DataInicial < DateTime.Now || agendamento.DataFinal < DateTime.Now)
                 {
                     response.Status = false;
@@ -95,6 +96,47 @@ namespace Backend.Services.AgendamentoService
             return response;
         }
 
+        public async Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento)
+        {
+            Response<Agendamento> response = new Response<Agendamento>();
+            try
+            {
+                var agendamento = await _context.Agendamento
+                    .Include(a => a.Pagamento)
+                    .FirstOrDefaultAsync(a => a.Id == pagamento.idAgendamento && a.DeletionDate == null);
+
+                if (agendamento == null)
+                {
+                    response.Mensage = "Agendamento não encontrado";
+                    response.Status = false;
+                    response.Dados = null;
+                    return response;
+                }
+
+                Pagamento novoPagamento = new Pagamento
+                {
+                    Valor = pagamento.Valor,
+                    TipoPagemento = pagamento.TipoPagemento
+                };
+
+                agendamento.Pagamento = novoPagamento;
+                _context.Add(novoPagamento);
+                _context.Update(agendamento);
+                await _context.SaveChangesAsync();
+
+                response.Mensage = "Pagamento adicionado ao agendamento";
+                response.Status = true;
+                response.Dados = agendamento;
+            }
+            catch
+            {
+                response.Mensage = "Erro ao adicionar pagamento";
+                response.Status = false;
+                response.Dados = null;
+                return response;
+            }
+        return response;
+        }
         
     }
 }
