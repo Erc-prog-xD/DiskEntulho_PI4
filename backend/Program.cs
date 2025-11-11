@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Backend.Services.CacambaService;
 using Backend.Services.AgendamentoService;
+using Backend.Services.PagamentoService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -20,6 +21,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAuthInterface, AuthService>();
 builder.Services.AddScoped<ISenhaInterface, SenhaService>();
+builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<CacambaService>();
 

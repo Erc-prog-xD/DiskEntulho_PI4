@@ -7,6 +7,5 @@ namespace Backend.Services.AgendamentoService
     {
         Task<Response<Agendamento>> CadastrarAgendamento(AgendamentoDTO agendamento);
 
-        Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento);
     }
 }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Backend.Services.PagamentoService;
 using Microsoft.AspNetCore.Authorization;
-using Backend.Models;
+using Backend.Dto;
 
 namespace Backend.Controllers
 {
@@ -10,19 +10,19 @@ namespace Backend.Controllers
     [ApiController]
     public class PagamentoController : ControllerBase
     {
-        private readonly PagamentoService _pagamentoService;
+        private readonly IPagamentoInterface _pagamentoService;
 
-        public PagamentoController(PagamentoService pagamentoService)
+        public PagamentoController(IPagamentoInterface pagamentoService)
         {
             _pagamentoService = pagamentoService;
         }
 
-        // [Authorize]
-        // [HttpPost("CadastrarPagamento")]
-        // public async Task<ActionResult> CadastrarPagamento(Pagamento pagamentoBody)
-        // {
-        //     var response = await _pagamentoService.CadastrarPagamento(pagamentoBody);
-        //     return Ok(response);
-        // }
+        [Authorize]
+        [HttpPost("AddPagamento")]
+        public async Task<ActionResult> AdicionarPagamento(AddPagementoDTO pagamento)
+        {
+            var response = await _pagamentoService.AdicionarPagamento(pagamento);
+            return Ok(response);
+        }
     }
 }
