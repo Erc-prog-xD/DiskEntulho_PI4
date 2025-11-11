@@ -60,7 +60,7 @@ namespace Backend.Services.AuthService
 
             try
                 {
-                    var client = await _context.Client.FirstOrDefaultAsync(Client => Client.Cpf == clientLogin.Cpf);
+                    var client = await _context.Client.FirstOrDefaultAsync(Client => Client.Cpf == clientLogin.Cpf && Client.DeletionDate == null);
                     if (client == null)
                     {
                         response.Status = false;
