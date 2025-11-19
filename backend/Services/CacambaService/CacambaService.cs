@@ -45,6 +45,7 @@ namespace Backend.Services.CacambaService
                 
                 Cacamba cacamba = new Cacamba
                 {
+                    Codigo = body.Codigo,
                     Tamanho = body.Tamanho
                 };
 

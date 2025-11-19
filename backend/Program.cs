@@ -11,6 +11,8 @@ using Swashbuckle.AspNetCore.Filters;
 using Backend.Services.CacambaService;
 using Backend.Services.AgendamentoService;
 using Backend.Services.PagamentoService;
+using backend.Models;
+using backend.Services.PrecoService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -24,6 +26,7 @@ builder.Services.AddScoped<ISenhaInterface, SenhaService>();
 builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<CacambaService>();
+builder.Services.AddScoped<PrecoService>();
 
 
 
@@ -41,7 +44,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddSwaggerGen(options =>
-{   
+{
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Autorização via Bearer {token}, coloque nesse formato: Bearer {token}",
@@ -49,7 +52,7 @@ builder.Services.AddSwaggerGen(options =>
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
     });
-    
+
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 

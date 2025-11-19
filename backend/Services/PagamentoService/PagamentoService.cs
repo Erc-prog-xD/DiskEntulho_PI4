@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using backend.Models;
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
@@ -8,53 +9,83 @@ namespace Backend.Services.PagamentoService
 {
     public class PagamentoService : IPagamentoInterface
     {
-        private readonly AppDbContext _context; 
-        
+        private readonly AppDbContext _context;
+
         public PagamentoService(AppDbContext context)
         {
             _context = context;
         }
         public async Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento)
         {
-            Response<Agendamento> response = new Response<Agendamento>();
+            var response = new Response<Agendamento>();
+
             try
             {
+                // Buscar agendamento válido
                 var agendamento = await _context.Agendamento
                     .Include(a => a.Pagamento)
+                    .Include(a => a.Cacamba)
                     .FirstOrDefaultAsync(a => a.Id == pagamento.idAgendamento && a.DeletionDate == null);
 
-                if (agendamento == null)
+                if (agendamento == null || agendamento.Pagamento != null)
                 {
-                    response.Mensage = "Agendamento não encontrado";
-                    response.Status = false;
-                    response.Dados = null;
-                    return response;
+                    return new Response<Agendamento>
+                    {
+                        Mensage = "Agendamento não encontrado ou já possui pagamento",
+                        Status = false
+                    };
                 }
 
-                Pagamento novoPagamento = new Pagamento
+                // Buscar preço da caçamba
+                var preco = await _context.Preco
+                    .FirstOrDefaultAsync(p => p.codigoCacamba.Id == agendamento.Cacamba.Id);
+
+                if (preco == null)
                 {
-                    Valor = pagamento.Valor,
+                    return new Response<Agendamento>
+                    {
+                        Mensage = "Preço não encontrado para essa caçamba",
+                        Status = false
+                    };
+                }
+
+
+                // Criar novo pagamento
+                var novoPagamento = new Pagamento
+                {
+                    Valor = preco.Valor,
                     TipoPagemento = pagamento.TipoPagemento
                 };
+                // Definir status conforme o tipo de pagamento
+                if (novoPagamento.TipoPagemento == Enum.PagamentoTypeEnum.Especie)
+                {
+                    novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
+                }
 
-                agendamento.Pagamento = novoPagamento;
                 agendamento.StatusAgendamento = Enum.AgendamentoStatus.Processando;
-                _context.Add(novoPagamento);
-                _context.Update(agendamento);
+
+                // Persistir
+                agendamento.Pagamento = novoPagamento;
+                _context.Pagamento.Add(novoPagamento);
+                _context.Agendamento.Update(agendamento);
                 await _context.SaveChangesAsync();
 
-                response.Mensage = "Pagamento adicionado ao agendamento";
-                response.Status = true;
-                response.Dados = agendamento;
+                return new Response<Agendamento>
+                {
+                    Mensage = "Pagamento adicionado ao agendamento",
+                    Status = true,
+                    Dados = agendamento
+                };
             }
-            catch
+            catch (Exception ex)
             {
-                response.Mensage = "Erro ao adicionar pagamento";
-                response.Status = false;
-                response.Dados = null;
-                return response;
+                return new Response<Agendamento>
+                {
+                    Mensage = $"Erro ao adicionar pagamento: {ex.Message}",
+                    Status = false
+                };
             }
-        return response;
         }
+
     }
 }

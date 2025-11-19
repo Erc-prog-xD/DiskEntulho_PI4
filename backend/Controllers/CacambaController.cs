@@ -22,7 +22,7 @@ namespace Backend.Controllers
             var result = await _cacambaService.ListarTodos();
             return Ok(result);
         }
-        
+
         [Authorize]
         [HttpPost("CadastrarCacamba")]
         public async Task<ActionResult> CadastrarCacamba(CacambaDTO body)
@@ -30,6 +30,7 @@ namespace Backend.Controllers
             var response = await _cacambaService.Cadastrar(body);
             return Ok(response);
         }
+
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Deletar(int id)
