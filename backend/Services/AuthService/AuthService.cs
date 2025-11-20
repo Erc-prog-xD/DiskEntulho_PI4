@@ -29,6 +29,7 @@ namespace Backend.Services.AuthService
                     response.Mensage = "Cpf ja cadastrado!";
                     return response;
                 }
+
                 _senhaInterface.CriarSenhaHash(clientRegister.Password, out byte[] senhaHash, out byte[] senhaSalt);
                 Client client = new Client
                 {

@@ -46,19 +46,8 @@ namespace Backend.Services.AgendamentoService
                     return response;
                 }
 
-                var clientIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (clientIdClaim == null)
-                {
-                    response.Status = false;
-                    response.Mensage = "Usuário não autenticado.";
-                    return response;
-                }
-
-                int clientId = int.Parse(clientIdClaim);
-
                 // 🔹 Busca o cliente no banco
-                var client = await _context.Client.FindAsync(clientId);
+                var client = await _context.Client.FindAsync(int.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value));
                 if (client == null)
                 {
                     response.Status = false;

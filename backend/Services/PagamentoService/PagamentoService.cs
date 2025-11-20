@@ -4,6 +4,7 @@ using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Backend.Services.PagamentoService
 {
@@ -18,7 +19,6 @@ namespace Backend.Services.PagamentoService
         public async Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento)
         {
             var response = new Response<Agendamento>();
-
             try
             {
                 // Buscar agendamento válido
@@ -36,37 +36,36 @@ namespace Backend.Services.PagamentoService
                     };
                 }
 
-                // Buscar preço da caçamba
+                var agCacamba = await _context.Cacamba
+                    .FirstOrDefaultAsync(c =>c.Id == agendamento.Cacamba.Id);
+
                 var preco = await _context.Preco
-                    .FirstOrDefaultAsync(p => p.codigoCacamba.Id == agendamento.Cacamba.Id);
+                    .FirstOrDefaultAsync(a => a.Tamanho == agCacamba.Tamanho);
 
-                if (preco == null)
-                {
-                    return new Response<Agendamento>
-                    {
-                        Mensage = "Preço não encontrado para essa caçamba",
-                        Status = false
-                    };
-                }
+                var dias = (agendamento.DataFinal.Date - agendamento.DataInicial.Date).Days;
 
+                var valorTotal = preco.Valor * dias;
 
-                // Criar novo pagamento
                 var novoPagamento = new Pagamento
                 {
-                    Valor = preco.Valor,
-                    TipoPagemento = pagamento.TipoPagemento
+                    Valor = valorTotal,
+                    TipoPagemento = pagamento.TipoPagamento,
                 };
-                // Definir status conforme o tipo de pagamento
-                if (novoPagamento.TipoPagemento == Enum.PagamentoTypeEnum.Especie)
-                {
-                    novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
-                }
+
+                if(novoPagamento.TipoPagemento == Enum.PagamentoTypeEnum.Especie)
+                    {
+                        novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
+                    }
+                else    
+                    {
+                        novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Criado;
+                    }
+
+                _context.Pagamento.Add(novoPagamento);
+                await _context.SaveChangesAsync();
 
                 agendamento.StatusAgendamento = Enum.AgendamentoStatus.Processando;
-
-                // Persistir
                 agendamento.Pagamento = novoPagamento;
-                _context.Pagamento.Add(novoPagamento);
                 _context.Agendamento.Update(agendamento);
                 await _context.SaveChangesAsync();
 

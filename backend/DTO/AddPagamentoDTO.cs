@@ -10,6 +10,6 @@ namespace Backend.Dto
         [Required(ErrorMessage = "O campo Valor é obrigatório.")]
 
         [EnumDataType(typeof(PagamentoTypeEnum), ErrorMessage = "Tipo de pagamento inválido.")]
-        public required PagamentoTypeEnum TipoPagemento { get; set; }
+        public required PagamentoTypeEnum TipoPagamento { get; set; }
     }
 }

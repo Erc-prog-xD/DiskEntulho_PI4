@@ -15,7 +15,8 @@ namespace Backend.Controllers
         {
             _cacambaService = cacambaService;
         }
-        [Authorize]
+
+        [Authorize(Roles = "Admin,Client")]
         [HttpGet("ListarTodos")]
         public async Task<ActionResult> ListarTodos()
         {
@@ -23,7 +24,7 @@ namespace Backend.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost("CadastrarCacamba")]
         public async Task<ActionResult> CadastrarCacamba(CacambaDTO body)
         {
@@ -31,7 +32,7 @@ namespace Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Deletar(int id)
         {
@@ -39,7 +40,8 @@ namespace Backend.Controllers
             if (!deleted) return NotFound();
             return NoContent();
         }
-        [Authorize]
+        
+        [Authorize(Roles = "Admin,Client")]
         [HttpGet("{id}")]
         public async Task<ActionResult> ObterPorId(int id)
         {

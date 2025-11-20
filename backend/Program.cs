@@ -11,8 +11,7 @@ using Swashbuckle.AspNetCore.Filters;
 using Backend.Services.CacambaService;
 using Backend.Services.AgendamentoService;
 using Backend.Services.PagamentoService;
-using backend.Models;
-using backend.Services.PrecoService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -26,7 +25,6 @@ builder.Services.AddScoped<ISenhaInterface, SenhaService>();
 builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<CacambaService>();
-builder.Services.AddScoped<PrecoService>();
 
 
 
@@ -67,6 +65,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("isAdmin", "True"));
+});
 
 var app = builder.Build();
 

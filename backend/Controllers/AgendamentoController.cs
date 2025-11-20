@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
+    
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Client")]
     public class AgendamentoController : ControllerBase
     {
         private readonly IAgendamentoInterface _agendamentoService;
@@ -17,7 +19,6 @@ namespace Backend.Controllers
             _agendamentoService = agendamentoService;
         }
 
-        [Authorize]
         [HttpPost("CadastrarAgendamento")]
         public async Task<ActionResult> CadastrarAgendamento(AgendamentoDTO agendamentoBody)
         {

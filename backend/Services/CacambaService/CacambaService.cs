@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
@@ -9,39 +8,15 @@ namespace Backend.Services.CacambaService
     public class CacambaService : Cacamba
     {
         private readonly AppDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public CacambaService(AppDbContext context,  IHttpContextAccessor httpContextAccessor)
+        public CacambaService(AppDbContext context)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<Response<Cacamba>> Cadastrar(CacambaDTO body)
         {
             Response<Cacamba> response = new Response<Cacamba>();
-
             try
             {
-                var clientIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (clientIdClaim == null)
-                {
-                    response.Status = false;
-                    response.Mensage = "Usuário não autenticado.";
-                    return response;
-                }
-
-                int clientId = int.Parse(clientIdClaim);
-
-                // 🔹 Busca o cliente no banco
-                var client = await _context.Client.FindAsync(clientId);
-                if (client == null || client.isAdmin == false)
-                {
-                    response.Status = false;
-                    response.Mensage = "Cliente não encontrado ou não é admin.";
-                    return response;
-                }
-                
                 
                 Cacamba cacamba = new Cacamba
                 {
