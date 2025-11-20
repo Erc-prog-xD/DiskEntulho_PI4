@@ -18,6 +18,7 @@ namespace Backend.Services.CacambaService
         {
             
             Response<List<Cacamba>> response = new Response<List<Cacamba>>();
+              {
                 try
                 {
                     if (inicio >= fim)
@@ -26,22 +27,34 @@ namespace Backend.Services.CacambaService
                         response.Mensage = "A data inicial deve ser menor que a data final.";
                         return response;
                     }
-                    
-                    var cacambas = await _context.Cacamba
-                        .Where(c => c.DeletionDate == null && c.StatusCacamba== CacambaEnum.Disponivel).ToListAsync();
 
-                    var agendamento = await _context.Agendamento
-                        .Where(a => a.DeletionDate == null 
-                        && a.StatusAgendamento != AgendamentoStatus.Rejeitado 
-                        && a.DataInicial <= fim && a.DataFinal >= inicio).Include(a => a.Cacamba).ToListAsync();
-                    
-                    var cacambasOcupadas = new HashSet<int>(
-                        agendamento.Select(a => a.Cacamba.Id)
-                    );
-                    var cacambasLivres = cacambas
-                    .Where(c => !cacambasOcupadas.Contains(c.Id))
-                    .ToList();
-                   
+                    var statusBloqueados = new[]
+                    {
+                        AgendamentoStatus.Criado,
+                        AgendamentoStatus.Processando,
+                        AgendamentoStatus.Confirmado
+                    };
+
+                    // pega apenas IDs das ocupadas
+                    var cacambasOcupadas = await _context.Agendamento
+                        .Where(a =>
+                            a.DeletionDate == null &&
+                            statusBloqueados.Contains(a.StatusAgendamento) &&
+                            a.DataInicial <= fim &&
+                            a.DataFinal >= inicio
+                        )
+                        .Select(a => a.Cacamba.Id)
+                        .Distinct()
+                        .ToListAsync();
+
+                    // pega caçambas livres
+                    var cacambasLivres = await _context.Cacamba
+                        .Where(c =>
+                            c.DeletionDate == null &&
+                            c.StatusCacamba == CacambaEnum.Disponivel &&
+                            !cacambasOcupadas.Contains(c.Id)
+                        )
+                        .ToListAsync();
 
                     response.Status = true;
                     response.Mensage = "Lista de caçambas disponíveis encontrada.";
@@ -51,10 +64,10 @@ namespace Backend.Services.CacambaService
                 {
                     response.Status = false;
                     response.Mensage = "Erro ao buscar caçambas disponíveis: " + ex.Message;
-                    response.Dados = null;
                 }
 
                 return response;
+            }
         }
  
 

@@ -5,7 +5,8 @@ namespace Backend.Enum
         Criado = 0,
         Processando = 1,
         Rejeitado = 2,
-        Confirmado = 3
+        Confirmado = 3,
+        Finalizado = 4
         
     }
 }
