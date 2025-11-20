@@ -16,7 +16,73 @@ namespace Backend.Services.AgendamentoService
             _context = context;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<Response<Agendamento>> CadastrarAgendamento(AgendamentoDTO agendamento)
+
+        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos()
+        {
+            Response<List<AgendamentoResponseDTO>> response = new Response<List<AgendamentoResponseDTO>>();
+                try
+                {
+
+                var client = await _context.Client.FindAsync(int.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+                
+                if (client == null)
+                {
+                    response.Status = false;
+                    response.Mensage = "Cliente não encontrado.";
+                    return response;
+                }
+
+                // Busca agendamentos com os relacionamentos necessários
+                var agendamentos = await _context.Agendamento
+                    .Where(a => a.Client.Id == client.Id && a.DeletionDate == null)
+                    .Include(a => a.Endereco)
+                    .Include(a => a.Cacamba)
+                    .ToListAsync();
+
+                // Converte para DTO
+                var agendamentosDto = agendamentos.Select(a => new AgendamentoResponseDTO
+                { 
+                    Coord_X = a.Coord_X,
+                    Coord_Y = a.Coord_Y,
+                    StatusAgendamento = a.StatusAgendamento,
+                    DataInicial = a.DataInicial,
+                    DataFinal = a.DataFinal,
+
+                    Endereco = new Endereco
+                    {
+                        Rua = a.Endereco.Rua,
+                        Bairro = a.Endereco.Bairro,
+                        Cidade = a.Endereco.Cidade,
+                        Estado = a.Endereco.Estado,
+                        DescricaoLocal = a.Endereco.DescricaoLocal,
+                        Referencia = a.Endereco.Referencia
+                    },
+
+                    Cacamba = new CacambaDTO
+                    {
+                       Codigo = a.Cacamba.Codigo,
+                       Tamanho = a.Cacamba.Tamanho
+                    }
+
+                }).ToList();
+
+                    response.Status = true;
+                    response.Mensage = "Agendamentos encontrados.";
+                    response.Dados = agendamentosDto;
+                }
+
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Mensage = "Erro ao buscar agendamentos: " + ex.Message;
+                response.Dados = null;
+            }
+
+            return response;
+
+        }
+
+        public async Task<Response<Agendamento>> CadastrarAgendamento(AgendamentoCreateDTO agendamento)
         {
             Response<Agendamento> response = new Response<Agendamento>();
             try

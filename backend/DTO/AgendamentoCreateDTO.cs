@@ -5,7 +5,7 @@ using Backend.Models;
 
 namespace Backend.Dto
 {
-    public class AgendamentoDTO
+    public class AgendamentoCreateDTO
     {
         // Coordenadas opcionais
         public double? Coord_X { get; set; }

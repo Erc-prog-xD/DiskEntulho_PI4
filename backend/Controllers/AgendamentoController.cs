@@ -20,12 +20,18 @@ namespace Backend.Controllers
         }
 
         [HttpPost("CadastrarAgendamento")]
-        public async Task<ActionResult> CadastrarAgendamento(AgendamentoDTO agendamentoBody)
+        public async Task<ActionResult> CadastrarAgendamento(AgendamentoCreateDTO agendamentoBody)
         {
             var response = await _agendamentoService.CadastrarAgendamento(agendamentoBody);
             return Ok(response);
         }
 
+        [HttpGet("AgendamentosFeitos")]
+        public async Task<ActionResult> AgendamentosFeitos()
+        {
+            var response = await _agendamentoService.BuscarAgendamentosFeitos();
+            return Ok(response);
+        }
 
     }
 }

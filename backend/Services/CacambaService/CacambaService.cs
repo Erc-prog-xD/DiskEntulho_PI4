@@ -18,7 +18,6 @@ namespace Backend.Services.CacambaService
         {
             
             Response<List<Cacamba>> response = new Response<List<Cacamba>>();
-              {
                 try
                 {
                     if (inicio >= fim)
@@ -67,7 +66,7 @@ namespace Backend.Services.CacambaService
                 }
 
                 return response;
-            }
+            
         }
  
 
