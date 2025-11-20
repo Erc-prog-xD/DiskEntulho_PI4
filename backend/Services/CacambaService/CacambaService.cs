@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Dto;
+using Backend.Enum;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,52 @@ namespace Backend.Services.CacambaService
         {
             _context = context;
         }
+
+        public async Task<Response<List<Cacamba>>> CacambasDisponiveis(DateTime inicio, DateTime fim)
+        {
+            
+            Response<List<Cacamba>> response = new Response<List<Cacamba>>();
+                try
+                {
+                    if (inicio >= fim)
+                    {
+                        response.Status = false;
+                        response.Mensage = "A data inicial deve ser menor que a data final.";
+                        return response;
+                    }
+                    
+                    var cacambas = await _context.Cacamba
+                        .Where(c => c.DeletionDate == null && c.StatusCacamba== CacambaEnum.Disponivel).ToListAsync();
+
+                    var agendamento = await _context.Agendamento
+                        .Where(a => a.DeletionDate == null 
+                        && a.StatusAgendamento != AgendamentoStatus.Rejeitado 
+                        && a.DataInicial <= fim && a.DataFinal >= inicio).Include(a => a.Cacamba).ToListAsync();
+                    
+                    var cacambasOcupadas = new HashSet<int>(
+                        agendamento.Select(a => a.Cacamba.Id)
+                    );
+                    var cacambasLivres = cacambas
+                    .Where(c => !cacambasOcupadas.Contains(c.Id))
+                    .ToList();
+                   
+
+                    response.Status = true;
+                    response.Mensage = "Lista de caçambas disponíveis encontrada.";
+                    response.Dados = cacambasLivres;
+                }
+                catch (Exception ex)
+                {
+                    response.Status = false;
+                    response.Mensage = "Erro ao buscar caçambas disponíveis: " + ex.Message;
+                    response.Dados = null;
+                }
+
+                return response;
+        }
+ 
+
+
         public async Task<Response<Cacamba>> Cadastrar(CacambaDTO body)
         {
             Response<Cacamba> response = new Response<Cacamba>();

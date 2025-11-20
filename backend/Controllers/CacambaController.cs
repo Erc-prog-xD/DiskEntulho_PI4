@@ -15,6 +15,14 @@ namespace Backend.Controllers
         {
             _cacambaService = cacambaService;
         }
+        
+        [Authorize(Roles = "Admin,Client")]
+        [HttpGet("CacambasDisponiveis")]
+        public async Task<IActionResult> CacambasDisponiveis(DateTime inicio, DateTime fim)
+        {
+            var result = await _cacambaService.CacambasDisponiveis(inicio, fim);
+            return Ok(result);
+        }
 
         [Authorize(Roles = "Admin,Client")]
         [HttpGet("ListarTodos")]
