@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
+using Backend.Services.NotificationService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.AgendamentoService
@@ -10,11 +11,14 @@ namespace Backend.Services.AgendamentoService
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationService _notificationService;
 
-        public AgendamentoService(AppDbContext context, IHttpContextAccessor httpContextAccessor)
+
+        public AgendamentoService(AppDbContext context, IHttpContextAccessor httpContextAccessor, INotificationService notificationService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _notificationService = notificationService;
         }
 
         public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos()
@@ -136,6 +140,12 @@ namespace Backend.Services.AgendamentoService
                 // Adiciona no contexto e salva
                 _context.Agendamento.Add(novoAgendamento);
                 await _context.SaveChangesAsync();
+
+                await _notificationService.CriarNotificacaoAsync(
+                    novoAgendamento.Id,
+                    client.Id,
+                    "Agendamento criado com sucesso!",
+                    novoAgendamento.StatusAgendamento);
 
                 response.Status = true;
                 response.Mensage = "Agendamento cadastrado com sucesso!";

@@ -12,6 +12,7 @@ using Backend.Services.CacambaService;
 using Backend.Services.AgendamentoService;
 using Backend.Services.PagamentoService;
 using Backend.Services.BackgroundServices;
+using Backend.Services.NotificationService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ builder.Services.AddScoped<IAuthInterface, AuthService>();
 builder.Services.AddScoped<ISenhaInterface, SenhaService>();
 builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<CacambaService>();
 builder.Services.AddHostedService<AgendamentoExpirationService>();
 

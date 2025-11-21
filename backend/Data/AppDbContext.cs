@@ -16,6 +16,7 @@ namespace Backend.Data
         public DbSet<Agendamento> Agendamento { get; set; }
         public DbSet<Preco> Preco { get; set; }
 
+        public DbSet<AgendamentoNotification> AgendamentoNotification {get ;set;}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

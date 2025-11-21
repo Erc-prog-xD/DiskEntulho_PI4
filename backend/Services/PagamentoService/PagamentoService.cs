@@ -3,6 +3,7 @@ using backend.Models;
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
+using Backend.Services.NotificationService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -11,10 +12,13 @@ namespace Backend.Services.PagamentoService
     public class PagamentoService : IPagamentoInterface
     {
         private readonly AppDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public PagamentoService(AppDbContext context)
+
+        public PagamentoService(AppDbContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
         public async Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento)
         {
@@ -24,6 +28,7 @@ namespace Backend.Services.PagamentoService
                 // Buscar agendamento válido
                 var agendamento = await _context.Agendamento
                     .Include(a => a.Pagamento)
+                    .Include(a => a.Client)
                     .Include(a => a.Cacamba)
                     .FirstOrDefaultAsync(a => a.Id == pagamento.idAgendamento && a.DeletionDate == null);
 
@@ -68,6 +73,13 @@ namespace Backend.Services.PagamentoService
                 agendamento.Pagamento = novoPagamento;
                 _context.Agendamento.Update(agendamento);
                 await _context.SaveChangesAsync();
+
+                await _notificationService.CriarNotificacaoAsync(
+                    agendamento.Id, 
+                    agendamento.Client.Id,
+                    "Pagamento adicionado ao agendamento, agora estamos processando seu agendamento",
+                    Enum.AgendamentoStatus.Processando
+                );
 
                 return new Response<Agendamento>
                 {
