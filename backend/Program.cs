@@ -32,7 +32,11 @@ builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<CacambaService>();
+
+
 builder.Services.AddHostedService<AgendamentoExpirationService>();
+builder.Services.AddHostedService<PagamentoStatusService>();
+
 
 
 builder.Services.Configure<PagBankSettings>(builder.Configuration.GetSection("PagBank"));

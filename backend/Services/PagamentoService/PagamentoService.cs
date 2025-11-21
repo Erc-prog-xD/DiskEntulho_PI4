@@ -1,12 +1,10 @@
-using System.Security.Claims;
-using backend.Models;
+
 using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
 using Backend.Services.NotificationService;
 using Backend.Services.PagBank;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace Backend.Services.PagamentoService
 {
@@ -66,7 +64,9 @@ namespace Backend.Services.PagamentoService
                     }
                 if (pagamento.TipoPagamento == Enum.PagamentoTypeEnum.Pix)
                     {
-                        novoPagamento.PixQrCode = await _pagBankService.CriarCobrancaPixAsync(valorTotal, $"Agendamento-{agendamento.Id}");
+                        var(orderId, qrCodeLink)= await _pagBankService.CriarCobrancaPixAsync(agendamento.Client, valorTotal, $"Agendamento-{agendamento.Id}",agendamento.Cacamba);
+                        novoPagamento.PagBankOrderId = orderId;
+                        novoPagamento.PagBankQrCode = qrCodeLink;
                         novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Criado;
                     }
                 else    

@@ -10,6 +10,7 @@ namespace Backend.Models
         public PagamentoStatusEnum StatusPagemento { get; set; } = PagamentoStatusEnum.Criado;
         public DateTime CreationDate { get; set; } = DateTime.Now;
         public DateTime? DeletionDate { get; set; } = null;
-        public string? PixQrCode { get; set; }
+        public string? PagBankOrderId { get; set; }
+        public string? PagBankQrCode { get; set; }
     }
 }
