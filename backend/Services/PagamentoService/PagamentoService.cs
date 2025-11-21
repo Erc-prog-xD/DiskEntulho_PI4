@@ -4,6 +4,7 @@ using Backend.Data;
 using Backend.Dto;
 using Backend.Models;
 using Backend.Services.NotificationService;
+using Backend.Services.PagBank;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -14,11 +15,13 @@ namespace Backend.Services.PagamentoService
         private readonly AppDbContext _context;
         private readonly INotificationService _notificationService;
 
+        private readonly PagBankService _pagBankService;
 
-        public PagamentoService(AppDbContext context, INotificationService notificationService)
+        public PagamentoService(AppDbContext context, INotificationService notificationService, PagBankService pagBankService)
         {
             _context = context;
             _notificationService = notificationService;
+            _pagBankService = pagBankService;
         }
         public async Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento)
         {
@@ -60,6 +63,11 @@ namespace Backend.Services.PagamentoService
                 if(novoPagamento.TipoPagemento == Enum.PagamentoTypeEnum.Especie)
                     {
                         novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
+                    }
+                if (pagamento.TipoPagamento == Enum.PagamentoTypeEnum.Pix)
+                    {
+                        novoPagamento.PixQrCode = await _pagBankService.CriarCobrancaPixAsync(valorTotal, $"Agendamento-{agendamento.Id}");
+                        novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Criado;
                     }
                 else    
                     {

@@ -1,21 +1,25 @@
 using Backend.Controllers;
 using Backend.Data;
-using Backend.Services.SenhaService;
+using Backend.Services.AgendamentoService;
 using Backend.Services.AuthService;
-
+using Backend.Services.BackgroundServices;
+using Backend.Services.CacambaService;
+using Backend.Services.NotificationService;
+using Backend.Services.PagamentoService;
+using Backend.Services.PagBank;
+using Backend.Services.SenhaService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using Backend.Services.CacambaService;
-using Backend.Services.AgendamentoService;
-using Backend.Services.PagamentoService;
-using Backend.Services.BackgroundServices;
-using Backend.Services.NotificationService;
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddControllers();
 
 builder.Services.AddHttpContextAccessor();
@@ -31,9 +35,12 @@ builder.Services.AddScoped<CacambaService>();
 builder.Services.AddHostedService<AgendamentoExpirationService>();
 
 
-
-
-
+builder.Services.Configure<PagBankSettings>(builder.Configuration.GetSection("PagBank"));
+builder.Services.AddSingleton<PagBankService>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<PagBankSettings>>().Value;
+    return new PagBankService(settings);
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -68,7 +75,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
         ValidateAudience = false,
         ValidateIssuer = false
+        
     };
+
 });
 
 
@@ -77,6 +86,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireClaim("isAdmin", "True"));
 });
+
 
 var app = builder.Build();
 
