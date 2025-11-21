@@ -12,7 +12,6 @@ namespace Backend.Services.PagamentoService
     {
         private readonly AppDbContext _context;
         private readonly INotificationService _notificationService;
-
         private readonly PagBankService _pagBankService;
 
         public PagamentoService(AppDbContext context, INotificationService notificationService, PagBankService pagBankService)
