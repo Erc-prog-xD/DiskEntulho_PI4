@@ -56,7 +56,7 @@ namespace Backend.Services.BackgroundServices
                                     pagamento.StatusPagemento = Enum.PagamentoStatusEnum.Aprovado;
 
                                     await notificationService.CriarNotificacaoAsync(
-                                    pagamento.Id,
+                                    agendamento.Id,
                                     agendamento.Client.Id,
                                     "Verificamos o pagamento e ele foi aprovado! Seu agendamento está CONFIRMADO",
                                     Enum.AgendamentoStatus.Confirmado);
@@ -66,7 +66,7 @@ namespace Backend.Services.BackgroundServices
                                 case "CANCELLED":
                                     pagamento.StatusPagemento = Enum.PagamentoStatusEnum.Rejeitado;
                                     await notificationService.CriarNotificacaoAsync(
-                                    pagamento.Id,
+                                    agendamento.Id,
                                     agendamento.Client.Id,
                                     "Verificamos o pagamento e ele foi cancelado! Seu agendamento está REJEITADO",
                                     Enum.AgendamentoStatus.Rejeitado);
@@ -75,7 +75,7 @@ namespace Backend.Services.BackgroundServices
                                 case "WAITING":
                                     pagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
                                     await notificationService.CriarNotificacaoAsync(
-                                    pagamento.Id,
+                                    agendamento.Id,
                                     agendamento.Client.Id,
                                     "Verificamos o pagamento e ele está em ESPERA! Seu agendamento está PROCESSANDO",
                                     Enum.AgendamentoStatus.Processando);

@@ -29,7 +29,7 @@ namespace Backend.Services.BackgroundServices
             var _context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-            var limite = DateTime.Now.AddMinutes(-5);
+            var limite = DateTime.Now.AddMinutes(-10);
 
             var agendamentosExpirados = await _context.Agendamento
                 .Include(a => a.Client) 
