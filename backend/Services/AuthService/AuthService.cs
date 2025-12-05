@@ -34,6 +34,7 @@ namespace Backend.Services.AuthService
                 Client client = new Client
                 {
                     Name = clientRegister.Name,
+                    Email = clientRegister.Email,
                     Cpf = clientRegister.Cpf,
                     Phone = clientRegister.Phone,
                     PasswordHash = senhaHash,

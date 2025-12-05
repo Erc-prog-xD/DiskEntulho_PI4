@@ -10,24 +10,22 @@ namespace Backend.Services.AgendamentoService
     public class AgendamentoService : IAgendamentoInterface
     {
         private readonly AppDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly INotificationService _notificationService;
 
 
-        public AgendamentoService(AppDbContext context, IHttpContextAccessor httpContextAccessor, INotificationService notificationService)
+        public AgendamentoService(AppDbContext context, INotificationService notificationService)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _notificationService = notificationService;
         }
 
-        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos()
+        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos(int clientId)
         {
             Response<List<AgendamentoResponseDTO>> response = new Response<List<AgendamentoResponseDTO>>();
                 try
                 {
 
-                var client = await _context.Client.FindAsync(int.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+                var client = await _context.Client.FindAsync(clientId);
                 
                 if (client == null)
                 {
@@ -86,7 +84,7 @@ namespace Backend.Services.AgendamentoService
 
         }
 
-        public async Task<Response<Agendamento>> CadastrarAgendamento(AgendamentoCreateDTO agendamento)
+        public async Task<Response<Agendamento>> CadastrarAgendamento(int clientId,AgendamentoCreateDTO agendamento)
         {
             Response<Agendamento> response = new Response<Agendamento>();
             try
@@ -117,7 +115,7 @@ namespace Backend.Services.AgendamentoService
                 }
 
                 // 🔹 Busca o cliente no banco
-                var client = await _context.Client.FindAsync(int.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+                var client = await _context.Client.FindAsync(clientId);
                 if (client == null)
                 {
                     response.Status = false;

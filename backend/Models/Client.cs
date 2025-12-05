@@ -6,6 +6,7 @@ namespace Backend.Models
         public int Id { get; set; }
         public required string Name { get; set; }
         public required string Cpf { get; set; }
+        public required string Email {get;set;}
         public required string Phone { get; set; }
         public required byte[] PasswordHash { get; set; }
         public required byte[] PasswordSalt { get; set; }

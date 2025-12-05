@@ -32,9 +32,9 @@ namespace Backend.Services.BackgroundServices
 
                     // Buscar pagamentos que ainda não foram pagos
                     var pagamentos = await context.Pagamento
-                     .Where(p => (p.StatusPagemento == Enum.PagamentoStatusEnum.Criado ||
-                                  p.StatusPagemento == Enum.PagamentoStatusEnum.Processando) &&
-                                  p.TipoPagemento == Enum.PagamentoTypeEnum.Pix)
+                     .Where(p => (p.StatusPagamento == Enum.PagamentoStatusEnum.Criado ||
+                                  p.StatusPagamento == Enum.PagamentoStatusEnum.Processando) &&
+                                  p.TipoPagamento == Enum.PagamentoTypeEnum.Pix)
                      .ToListAsync(stoppingToken);
 
 
@@ -53,7 +53,7 @@ namespace Backend.Services.BackgroundServices
                             {
                                 
                                 case "PAID":
-                                    pagamento.StatusPagemento = Enum.PagamentoStatusEnum.Aprovado;
+                                    pagamento.StatusPagamento = Enum.PagamentoStatusEnum.Aprovado;
 
                                     await notificationService.CriarNotificacaoAsync(
                                     agendamento.Id,
@@ -64,7 +64,7 @@ namespace Backend.Services.BackgroundServices
 
                                     break;
                                 case "CANCELLED":
-                                    pagamento.StatusPagemento = Enum.PagamentoStatusEnum.Rejeitado;
+                                    pagamento.StatusPagamento = Enum.PagamentoStatusEnum.Rejeitado;
                                     await notificationService.CriarNotificacaoAsync(
                                     agendamento.Id,
                                     agendamento.Client.Id,
@@ -73,7 +73,7 @@ namespace Backend.Services.BackgroundServices
                                     agendamento.StatusAgendamento = Enum.AgendamentoStatus.Rejeitado;
                                     break;
                                 case "WAITING":
-                                    pagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
+                                    pagamento.StatusPagamento = Enum.PagamentoStatusEnum.Processando;
                                     await notificationService.CriarNotificacaoAsync(
                                     agendamento.Id,
                                     agendamento.Client.Id,

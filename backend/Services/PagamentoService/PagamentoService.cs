@@ -43,10 +43,26 @@ namespace Backend.Services.PagamentoService
 
                 var agCacamba = await _context.Cacamba
                     .FirstOrDefaultAsync(c =>c.Id == agendamento.Cacamba.Id);
+                
+                if( agCacamba == null)
+                {
+                    response.Mensage = "Cacamba não encontrada";
+                    response.Status = false;
+                    response.Dados = null;
+                    return response;
+                }
 
                 var preco = await _context.Preco
                     .FirstOrDefaultAsync(a => a.Tamanho == agCacamba.Tamanho);
 
+                if(preco == null)
+                {
+                    response.Mensage = "Preco não encontrado na tabela";
+                    response.Status = false;
+                    response.Dados = null;
+                    return response;
+                }
+                
                 var dias = (agendamento.DataFinal.Date - agendamento.DataInicial.Date).Days;
 
                 var valorTotal = preco.Valor * dias;
@@ -54,23 +70,23 @@ namespace Backend.Services.PagamentoService
                 var novoPagamento = new Pagamento
                 {
                     Valor = valorTotal,
-                    TipoPagemento = pagamento.TipoPagamento,
+                    TipoPagamento = pagamento.TipoPagamento,
                 };
 
-                if(novoPagamento.TipoPagemento == Enum.PagamentoTypeEnum.Especie)
+                if(novoPagamento.TipoPagamento == Enum.PagamentoTypeEnum.Especie)
                     {
-                        novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Processando;
+                        novoPagamento.StatusPagamento = Enum.PagamentoStatusEnum.Processando;
                     }
                 if (pagamento.TipoPagamento == Enum.PagamentoTypeEnum.Pix)
                     {
                         var(orderId, qrCodeLink)= await _pagBankService.CriarCobrancaPixAsync(agendamento.Client, valorTotal, $"Agendamento-{agendamento.Id}",agendamento.Cacamba);
                         novoPagamento.PagBankOrderId = orderId;
                         novoPagamento.PagBankQrCode = qrCodeLink;
-                        novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Criado;
+                        novoPagamento.StatusPagamento = Enum.PagamentoStatusEnum.Criado;
                     }
                 else    
                     {
-                        novoPagamento.StatusPagemento = Enum.PagamentoStatusEnum.Criado;
+                        novoPagamento.StatusPagamento = Enum.PagamentoStatusEnum.Criado;
                     }
 
                 _context.Pagamento.Add(novoPagamento);

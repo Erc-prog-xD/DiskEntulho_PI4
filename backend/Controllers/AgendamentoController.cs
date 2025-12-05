@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Dto;
 using Backend.Services.AgendamentoService;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -22,14 +23,17 @@ namespace Backend.Controllers
         [HttpPost("CadastrarAgendamento")]
         public async Task<ActionResult> CadastrarAgendamento(AgendamentoCreateDTO agendamentoBody)
         {
-            var response = await _agendamentoService.CadastrarAgendamento(agendamentoBody);
+            int clientId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
+            var response = await _agendamentoService.CadastrarAgendamento(clientId,agendamentoBody);
             return Ok(response);
         }
 
         [HttpGet("AgendamentosFeitos")]
         public async Task<ActionResult> AgendamentosFeitos()
+        
         {
-            var response = await _agendamentoService.BuscarAgendamentosFeitos();
+            var clientId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
+            var response = await _agendamentoService.BuscarAgendamentosFeitos(clientId);
             return Ok(response);
         }
 

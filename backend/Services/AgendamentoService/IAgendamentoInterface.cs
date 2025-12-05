@@ -5,8 +5,8 @@ namespace Backend.Services.AgendamentoService
 {
     public interface IAgendamentoInterface
     {
-        Task<Response<Agendamento>> CadastrarAgendamento(AgendamentoCreateDTO agendamento);
+        Task<Response<Agendamento>> CadastrarAgendamento(int clientId, AgendamentoCreateDTO agendamento);
 
-        Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos();
+        Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos(int clientId);
     }
 }

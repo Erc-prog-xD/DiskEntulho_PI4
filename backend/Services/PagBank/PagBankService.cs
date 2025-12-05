@@ -37,7 +37,7 @@ namespace Backend.Services.PagBank
                 customer = new
                 {
                     name = client.Name,
-                    email = "noemail@cliente.com",
+                    email = client.Email,
                     tax_id = client.Cpf
                 },
                 items = new[]
