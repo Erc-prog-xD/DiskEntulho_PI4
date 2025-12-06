@@ -5,7 +5,48 @@ import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [cpf, setCpf] = useState("");
+    const [password, setPassword] = useState("");
+
+
+   async function handleLogin(e: React.FormEvent) {
+      e.preventDefault();
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+      try {
+        const response = await fetch(`${apiUrl}/api/Auth/Login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cpf: cpf,
+            password: password,
+          }),
+        });
+
+        if (!response.ok) {
+          alert("Usuário ou senha incorretos");
+          return;
+        }
+
+        const data = await response.json();
+        console.log("Login OK:", data);
+
+        // Exemplo: salvar token
+        localStorage.setItem("token", data.token);
+
+      } catch (error) {
+        console.error("Erro ao fazer login:", error);
+        alert("Erro ao conectar com o servidor.");
+      }
+    }
+
+
+
+
 
   return (
     <div className="flex min-h-screen w-full bg-white font-sans">
@@ -31,17 +72,18 @@ export function LoginForm() {
             </p>
           </div>
 
-          <form className="flex flex-col gap-8">
+          <form className="flex flex-col gap-8" onSubmit={handleLogin}>
             <div className="flex flex-col gap-5">
-              <label htmlFor="username" className="text-xl font-semibold text-black">
-                Usuário
+              <label htmlFor="Cpf" className="text-xl font-semibold text-black">
+                Cpf
               </label>
               <input
-                id="username"
+                id="Cpf"
                 type="text"
-                placeholder="Digite seu usuário"
+                placeholder="Digite seu Cpf"
+                onChange={(e) => setCpf(e.target.value)}
                 className="h-[65px] w-full rounded-lg border border-[#b1b1b1] px-7 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
-              />
+                />
             </div>
 
             <div className="flex flex-col gap-5">
@@ -53,6 +95,7 @@ export function LoginForm() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Digite sua senha"
+                  onChange={(e) => setPassword(e.target.value)}
                   className="h-[65px] w-full rounded-lg border border-[#b1b1b1] px-7 pr-14 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
                 />
                 <button

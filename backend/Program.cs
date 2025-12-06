@@ -22,8 +22,19 @@ var builder = WebApplication.CreateBuilder(args);
 // -----------------------------------------------------------------------------
 // 🔥 1) Carregar o arquivo .env (antes de qualquer configuração)
 // -----------------------------------------------------------------------------
-Env.Load(); // carrega variáveis do .env
+var envFile = builder.Environment.IsDevelopment()
+    ? Path.Combine(Directory.GetCurrentDirectory(), ".env.local")
+    : "/app/.env";  // caminho dentro do container
 
+if (File.Exists(envFile))
+{
+    Env.Load(envFile);
+    Console.WriteLine($"[ENV] Carregado: {envFile}");
+}
+else
+{
+    Console.WriteLine($"[ENV] Arquivo não encontrado: {envFile}");
+}
 
 // -----------------------------------------------------------------------------
 // 2) Expandir ${VARIAVEL} do appsettings.json usando as variáveis do ambiente
@@ -85,6 +96,18 @@ builder.Services.AddSingleton<PagBankService>(sp =>
     var settings = sp.GetRequiredService<IOptions<PagBankSettings>>().Value;
     return new PagBankService(settings);
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins("http://localhost:3000");
+    });
+});
+
 
 // -----------------------------------------------------------------------------
 // Banco de dados
@@ -155,6 +178,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
+
 // Swagger só no dev
 if (app.Environment.IsDevelopment())
 {
@@ -162,7 +187,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
