@@ -38,7 +38,6 @@ namespace Backend.Services.BackgroundServices
                      .ToListAsync(stoppingToken);
 
 
-
                     foreach (var pagamento in pagamentos)
                     {
                         // Consultar status no PagBank
@@ -46,6 +45,11 @@ namespace Backend.Services.BackgroundServices
                         var agendamento = await context.Agendamento
                             .Include(a => a.Client)
                             .FirstOrDefaultAsync(a => a.Pagamento.Id == pagamento.Id && a.DeletionDate == null, stoppingToken);
+
+                        if( agendamento == null)
+                        {
+                            return;
+                        }
 
                         if (status != null)
                         {

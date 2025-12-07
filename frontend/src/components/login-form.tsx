@@ -13,8 +13,8 @@ export function LoginForm() {
    async function handleLogin(e: React.FormEvent) {
       e.preventDefault();
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
+      const apiUrl = "http://localhost:8080";
+      
       try {
         const response = await fetch(`${apiUrl}/api/Auth/Login`, {
           method: "POST",
@@ -49,10 +49,11 @@ export function LoginForm() {
 
 
   return (
-    <div className="flex min-h-screen w-full bg-white">
-      <div className="flex flex-1 flex-col justify-center px-8 py-12 pl-24 pl-32 -mt-40">
+    <div className="flex min-h-screen w-full bg-white font-sans">
+      <div className="flex flex-1 flex-col justify-center px-8 py-12 lg:px-24 xl:px-32">
         <div className="mx-auto w-full max-w-[535px]">
-          <div className="mb-14">
+          
+          <div className="mb-10">
             <Image
               src="/assets/disk-entulho.png" 
               alt="Logo Disk Entulho"
@@ -63,7 +64,7 @@ export function LoginForm() {
           </div>
 
           <div className="flex flex-col gap-4 mb-16">
-            <h1 className="text-3xl font-semibold text-black tracking-normal leading-normal">
+            <h1 className="text-4xl font-semibold text-black tracking-normal leading-normal">
               Entre com sua conta
             </h1>
             <p className="text-2xl font-light text-black tracking-normal leading-normal">
@@ -74,14 +75,14 @@ export function LoginForm() {
           <form className="flex flex-col gap-8" onSubmit={handleLogin}>
             <div className="flex flex-col gap-5">
               <label htmlFor="Cpf" className="text-xl font-semibold text-black">
-                CPF
+                Cpf
               </label>
               <input
                 id="Cpf"
                 type="text"
-                placeholder="Digite seu CPF"
+                placeholder="Digite seu Cpf"
                 onChange={(e) => setCpf(e.target.value)}
-                className="h-[63px] w-full rounded-lg border border-[#b1b1b1] px-7 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
+                className="h-[65px] w-full rounded-lg border border-[#b1b1b1] px-7 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
                 />
             </div>
 
@@ -95,7 +96,7 @@ export function LoginForm() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Digite sua senha"
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-[63px] w-full rounded-lg border border-[#b1b1b1] px-7 pr-14 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
+                  className="h-[65px] w-full rounded-lg border border-[#b1b1b1] px-7 pr-14 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
                 />
                 <button
                   type="button"
@@ -107,7 +108,7 @@ export function LoginForm() {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-8">
               <button
                 type="submit"
                 className="flex h-[65px] w-full items-center justify-center rounded-lg bg-[#0023C4] text-2xl font-semibold text-white transition-colors hover:bg-blue-800"
@@ -115,16 +116,24 @@ export function LoginForm() {
                 Login
               </button>
             </div>
+
           </form>
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-1 relative items-center justify-center overflow-hidden">
-        <div className="absolute inset-y-0 right-0 left-36 bg-[#0023C4] opacity-95 z-0">
-      </div>
-        <div className="relative w-full max-w-[633px] aspect-square p-10 z-10 -translate-x-40">
+      <div className="hidden lg:flex flex-1 relative bg-[#0023C4] items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 w-full h-full">
+             <Image 
+                src="/assets/bg-image.png" 
+                alt="Background details"
+                fill
+                className="object-cover opacity-50 mix-blend-overlay"
+             />
+        </div>
+
+        <div className="relative w-full max-w-[633px] aspect-square p-10 z-10">
           <Image
-            src="/assets/form-image.svg"
+            src="\assets\form-image.svg" 
             alt="Ilustração login"
             fill
             className="object-contain"
