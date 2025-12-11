@@ -41,7 +41,7 @@ namespace Backend.Services.SenhaService
                     new Claim(ClaimTypes.Role, client.isAdmin ? "Admin" : "Client")
                 };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value ?? ""));
 
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 

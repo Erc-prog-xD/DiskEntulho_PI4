@@ -20,20 +20,33 @@ using Swashbuckle.AspNetCore.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 // -----------------------------------------------------------------------------
-// 🔥 1) Carregar o arquivo .env (antes de qualquer configuração)
+// 🔥 1) Carregar o arquivo .env (Busca Recursiva)
 // -----------------------------------------------------------------------------
-var envFile = builder.Environment.IsDevelopment()
-    ? Path.Combine(Directory.GetCurrentDirectory(), ".env.local")
-    : "/app/.env";  // caminho dentro do container
+// Função local para encontrar o .env onde quer que ele esteja na árvore de pastas
+var currentDirectory = Directory.GetCurrentDirectory();
+var envLoaded = false;
 
-if (File.Exists(envFile))
+// Tenta subir até 6 níveis de diretório para achar o .env
+for (int i = 0; i < 6; i++)
 {
-    Env.Load(envFile);
-    Console.WriteLine($"[ENV] Carregado: {envFile}");
+    var envPath = Path.Combine(currentDirectory, ".env");
+    
+    if (File.Exists(envPath))
+    {
+        DotNetEnv.Env.Load(envPath);
+        Console.WriteLine($"[ENV] 🟢 Carregado de: {envPath}");
+        envLoaded = true;
+        break;
+    }
+
+    var parent = Directory.GetParent(currentDirectory);
+    if (parent == null) break;
+    currentDirectory = parent.FullName;
 }
-else
+
+if (!envLoaded)
 {
-    Console.WriteLine($"[ENV] Arquivo não encontrado: {envFile}");
+    Console.WriteLine($"[ENV] 🔴 Arquivo .env não encontrado. Certifique-se que ele existe na raiz do projeto.");
 }
 
 // -----------------------------------------------------------------------------
@@ -50,7 +63,11 @@ foreach (DictionaryEntry envVar in Environment.GetEnvironmentVariables())
     if (string.IsNullOrWhiteSpace(key))
         continue;
 
-    originalJson = originalJson.Replace("${" + key + "}", value);
+    // Apenas substitui se encontrar a chave no formato ${CHAVE}
+    if (originalJson.Contains("${" + key + "}"))
+    {
+        originalJson = originalJson.Replace("${" + key + "}", value);
+    }
 }
 
 // salvar em um appsettings gerado em tempo de execução
@@ -147,6 +164,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         var tokenKey = builder.Configuration["AppSettings:Token"];
+        
+        // Verificação de segurança para Debug
+        if (string.IsNullOrEmpty(tokenKey) || tokenKey.Length < 16)
+        {
+             Console.WriteLine($"[AUTH ALERT] Token JWT inválido ou não carregado! Valor: '{tokenKey}'");
+             // Fallback apenas para não crashar a inicialização, mas o login falhará
+             tokenKey = "chave_fallback_temporaria_para_debug_apenas_123456"; 
+        }
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -179,15 +204,11 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-
-// Swagger só no dev
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-//app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
 

@@ -13,24 +13,18 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=DiskEntulhoDB;User Id=sa;Password=DiskEntulho@123;TrustServerCertificate=True;
-         # === VARIÁVEIS QUE ESTAVAM NO .env ===
-      - TOKEN=${TOKEN}
-      - TOKEN_ACESSO_PAGBANK=${TOKEN_ACESSO_PAGBANK}
-      - ENVERIOMENT_PAGBANK=${ENVERIOMENT_PAGBANK}
+    env_file:
+      - ./.env
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: "http://localhost:8080"  # <- passa pro build
     container_name: diskentulho_frontend
     ports:
       - "3000:3000"
     depends_on:
       - api
-    environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:8080"
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest

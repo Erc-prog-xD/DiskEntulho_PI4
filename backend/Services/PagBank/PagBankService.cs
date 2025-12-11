@@ -66,6 +66,11 @@ namespace Backend.Services.PagBank
 
             if (!response.IsSuccessful)
                 throw new Exception($"Erro PagBank: {response.StatusCode} - {response.Content}");
+            
+            if(response.Content == null)
+            {
+                throw new Exception($"Erro Content null: {response.Content}");
+            }
 
             using var doc = JsonDocument.Parse(response.Content);
             var root = doc.RootElement;
@@ -95,6 +100,11 @@ namespace Backend.Services.PagBank
 
             if (!response.IsSuccessful)
                 return null;
+
+            if(response.Content == null)
+            {
+                return null;
+            }
 
             using var doc = JsonDocument.Parse(response.Content);
             var root = doc.RootElement;
