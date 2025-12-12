@@ -252,7 +252,7 @@ export function RegisterForm() {
             <div className="text-center mt-2">
               <p className="text-lg text-gray-600">
                 Já tem uma conta?{' '}
-                <Link href="/login" className="font-semibold text-[#0023C4] hover:underline">
+                <Link href="/?login" className="font-semibold text-[#0023C4] hover:underline">
                   Faça login
                 </Link>
               </p>

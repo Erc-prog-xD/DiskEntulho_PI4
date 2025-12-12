@@ -120,7 +120,7 @@ export function LoginForm() {
 
   return (
     <div className="flex min-h-screen w-full bg-white font-sans">
-      <div className="flex flex-1 flex-col justify-center px-8 py-12 lg:px-24 xl:px-32">
+      <div className="flex flex-1 flex-col justify-center pt-6 pb-10 px-8 py-12 lg:px-24 xl:px-32">
         <div className="mx-auto w-full max-w-[535px]">
           
           <div className="mb-10">
