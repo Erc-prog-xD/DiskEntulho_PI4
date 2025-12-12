@@ -25,19 +25,12 @@ export function LoginForm() {
     let soma = 0;
     let resto;
 
-      const apiUrl = "http://localhost:8080";
-      
-      try {
-        const response = await fetch(`${apiUrl}/api/Auth/Login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            cpf: cpf,
-            password: password,
-          }),
-        });
+    for (let i = 1; i <= 9; i++) 
+        soma = soma + parseInt(cpf.substring(i-1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
 
     soma = 0;
     for (let i = 1; i <= 10; i++) 
@@ -152,15 +145,19 @@ export function LoginForm() {
           <form className="flex flex-col gap-8" onSubmit={handleLogin} noValidate>
             <div className="flex flex-col gap-2">
               <label htmlFor="Cpf" className="text-xl font-semibold text-black">
-                Cpf
+                CPF
               </label>
               <input
                 id="Cpf"
                 type="text"
-                placeholder="Digite seu Cpf"
-                onChange={(e) => setCpf(e.target.value)}
+                placeholder="Digite seu CPF"
+                value={cpf}
+                onChange={handleCpfChange}
                 className="h-[65px] w-full rounded-lg border border-[#b1b1b1] px-7 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
                 />
+                 {errors.cpf && (
+                  <span className="text-red-500 text-sm font-medium ml-1">{errors.cpf}</span>
+                )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -172,7 +169,8 @@ export function LoginForm() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Digite sua senha"
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                  onChange={handlePasswordChange}
                   className="h-[65px] w-full rounded-lg border border-[#b1b1b1] px-7 pr-14 text-xl text-[#2d2d2d] placeholder:text-[#2d2d2d] focus:border-[#0023C4] focus:outline-none focus:ring-1 focus:ring-[#0023C4]"
                 />
                 <button
@@ -203,17 +201,17 @@ export function LoginForm() {
 
       <div className="hidden lg:flex flex-1 relative bg-[#0023C4] items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full">
-             <Image 
+              <Image 
                 src="/assets/bg-image.png" 
                 alt="Background details"
                 fill
                 className="object-cover opacity-50 mix-blend-overlay"
-             />
+              />
         </div>
 
         <div className="relative w-full max-w-[633px] aspect-square p-10 z-10">
           <Image
-            src="\assets\form-image.svg" 
+            src="/assets/form-image.svg" 
             alt="Ilustração login"
             fill
             className="object-contain"
@@ -223,5 +221,4 @@ export function LoginForm() {
       </div>
     </div>
   );
-}
 }
