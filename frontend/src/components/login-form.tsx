@@ -87,7 +87,7 @@ export function LoginForm() {
 
     if (!validateForm()) return;
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const apiUrl = "http://localhost:8080";
     const cleanCpf = cpf.replace(/\D/g, ''); 
 
     try {
