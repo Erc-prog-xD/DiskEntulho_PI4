@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
 
   const publicRoutes = ['/auth/login', '/auth/register'];
   
-  return NextResponse.next();
   const { pathname } = request.nextUrl;
   const isPublicRoute = publicRoutes.includes(pathname);
 
@@ -18,5 +17,5 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  //return NextResponse.next();
+  return NextResponse.next();
 }
