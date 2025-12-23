@@ -158,7 +158,7 @@ export function RegisterForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nome: name,
+          name: name,
           email: email,
           phone: cleanTelefone,
           cpf: cleanCpf, 
