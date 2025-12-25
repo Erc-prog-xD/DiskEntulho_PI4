@@ -1,6 +1,8 @@
+'use client';
+
 import Image from "next/image"
 import { Card, CardContent } from "./ui/card"
-import { Button } from "./ui/button"
+import { useRouter } from "next/navigation";
 
 interface DumpsterCardProps {
   name: string
@@ -10,6 +12,7 @@ interface DumpsterCardProps {
 }
 
 export function CacambaCard({ name, volume, price, image }: DumpsterCardProps) {
+  const router = useRouter();
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-100">
       <CardContent className="p-0">
@@ -35,9 +38,12 @@ export function CacambaCard({ name, volume, price, image }: DumpsterCardProps) {
               <span className="text-base font-bold text-gray-900">{price}</span>
             </div>
           </div>
-          <Button className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-5 rounded-lg transition-colors shadow-sm">
-            Detalhes
-          </Button>
+        <button
+          onClick={() => router.push('/cacambas/confirmar')}
+          className="w-full h-12 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+        >
+          Detalhes
+        </button>
         </div>
       </CardContent>
     </Card>
