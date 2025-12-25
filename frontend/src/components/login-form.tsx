@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+
 
 interface FormErrors {
   cpf?: string;
@@ -186,7 +188,7 @@ export function LoginForm() {
               )}
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-4">
               <button
                 type="submit"
                 className="flex h-[65px] w-full items-center justify-center rounded-lg bg-[#0023C4] text-2xl font-semibold text-white transition-colors hover:bg-blue-800"
@@ -194,7 +196,15 @@ export function LoginForm() {
                 Login
               </button>
             </div>
-
+            <p className="mt-6 text-center text-lg text-black">
+              Não tem uma conta?{' '}
+              <Link
+                href="/auth/register"
+                className="font-semibold text-[#0023C4] hover:underline"
+              >
+                Cadastre-se
+              </Link>
+            </p>
           </form>
         </div>
       </div>
