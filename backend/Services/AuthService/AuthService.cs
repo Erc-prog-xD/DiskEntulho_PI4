@@ -26,7 +26,7 @@ namespace Backend.Services.AuthService
                 {
                     response.Dados = null;
                     response.Status = false;
-                    response.Mensage = "Cpf ja cadastrado!";
+                    response.Mensagem = "Cpf ja cadastrado!";
                     return response;
                 }
 
@@ -43,14 +43,14 @@ namespace Backend.Services.AuthService
                 _context.Add(client);
                 await _context.SaveChangesAsync();
 
-                response.Mensage = "Client Cadastrado!";
+                response.Mensagem = "Client Cadastrado!";
                
             }
             catch (Exception ex)
             {
                 response.Dados = null;
                 response.Status = false;
-                response.Mensage = ex.Message;
+                response.Mensagem = ex.Message;
             }
             return response;
 
@@ -58,7 +58,7 @@ namespace Backend.Services.AuthService
 
         public async Task<Response<string>> Login(ClientLoginDTO clientLogin)
         {
-            Response<string> response = new Response<string> { Mensage = "" };
+            Response<string> response = new Response<string> { Mensagem = "" };
 
             try
                 {
@@ -66,18 +66,18 @@ namespace Backend.Services.AuthService
                     if (client == null)
                     {
                         response.Status = false;
-                        response.Mensage = "Client não encontrado!";
+                        response.Mensagem = "Client não encontrado!";
                         return response;
                     }
                     if (!_senhaInterface.VerificaSenhaHash(clientLogin.Password, client.PasswordHash, client.PasswordSalt))
                     {
                         response.Status = false;
-                        response.Mensage = "Credenciais invalidas!";
+                        response.Mensagem = "Credenciais invalidas!";
                         return response;
                     }
 
                     var token = _senhaInterface.CriarToken(client);
-                    response.Mensage = "Login realizado com sucesso!";
+                    response.Mensagem = "Login realizado com sucesso!";
                     response.Dados = token;
                     response.Status = true;
 
@@ -86,7 +86,7 @@ namespace Backend.Services.AuthService
                 {
                     response.Dados = null;
                     response.Status = false;
-                    response.Mensage = ex.Message;
+                    response.Mensagem = ex.Message;
                 }
 
             return response;

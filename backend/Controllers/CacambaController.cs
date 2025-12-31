@@ -5,8 +5,8 @@ using Backend.Dto;
 using Microsoft.AspNetCore.Authorization;
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class CacambaController : ControllerBase
     {
         private readonly CacambaService _cacambaService;

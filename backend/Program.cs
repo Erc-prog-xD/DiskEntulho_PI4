@@ -1,6 +1,7 @@
 using System.Collections;
 using Backend.Controllers;
 using Backend.Data;
+using Backend.Services.AdminService;
 using Backend.Services.AgendamentoService;
 using Backend.Services.AuthService;
 using Backend.Services.BackgroundServices;
@@ -97,6 +98,7 @@ builder.Services.AddScoped<ISenhaInterface, SenhaService>();
 builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IAdminInterface, AdminService>();
 builder.Services.AddScoped<CacambaService>();
 
 // Background services

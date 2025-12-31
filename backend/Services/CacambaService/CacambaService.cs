@@ -23,7 +23,7 @@ namespace Backend.Services.CacambaService
                     if (inicio >= fim)
                     {
                         response.Status = false;
-                        response.Mensage = "A data inicial deve ser menor que a data final.";
+                        response.Mensagem = "A data inicial deve ser menor que a data final.";
                         return response;
                     }
 
@@ -56,13 +56,13 @@ namespace Backend.Services.CacambaService
                         .ToListAsync();
 
                     response.Status = true;
-                    response.Mensage = "Lista de caçambas disponíveis encontrada.";
+                    response.Mensagem = "Lista de caçambas disponíveis encontrada.";
                     response.Dados = cacambasLivres;
                 }
                 catch (Exception ex)
                 {
                     response.Status = false;
-                    response.Mensage = "Erro ao buscar caçambas disponíveis: " + ex.Message;
+                    response.Mensagem = "Erro ao buscar caçambas disponíveis: " + ex.Message;
                 }
 
                 return response;
@@ -87,13 +87,13 @@ namespace Backend.Services.CacambaService
                 
                 await _context.SaveChangesAsync();
 
-                response.Mensage = "Caçamba cadastrada com sucesso";
+                response.Mensagem = "Caçamba cadastrada com sucesso";
                 response.Status = true;
                 response.Dados = cacamba;
             }
             catch (Exception ex)
             {
-                response.Mensage = "Falha no cadastro da caçamba: " + ex.Message;
+                response.Mensagem = "Falha no cadastro da caçamba: " + ex.Message;
                 response.Status = false;
                 response.Dados = null;
             }
