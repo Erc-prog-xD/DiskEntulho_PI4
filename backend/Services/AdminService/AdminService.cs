@@ -132,12 +132,12 @@ namespace Backend.Services.AdminService
 
         }
 
-        public async Task<Response<string>> ApagarCliente(string ClientCpf)
+        public async Task<Response<string>> ApagarCliente(int idCliente)
         {
             Response<string> response = new Response<string>();
             try
             {
-                var client = await _context.Client.FirstOrDefaultAsync(a => a.Cpf == ClientCpf && a.DeletionDate == null);
+                var client = await _context.Client.FirstOrDefaultAsync(a => a.Id == idCliente && a.DeletionDate == null);
                 
                 if(client == null){
                     response.Status = true;
@@ -163,12 +163,12 @@ namespace Backend.Services.AdminService
             return response;
         }
         
-        public async Task<Response<string>> ReativarCliente(string ClientCpf)
+        public async Task<Response<string>> ReativarCliente(int idCliente)
         {
             Response<string> response = new Response<string>();
             try
             {
-                var client = await _context.Client.FirstOrDefaultAsync(a => a.Cpf == ClientCpf && a.DeletionDate != null);
+                var client = await _context.Client.FirstOrDefaultAsync(a => a.Id == idCliente && a.DeletionDate != null);
                 
                 if(client == null){
                     response.Status = true;

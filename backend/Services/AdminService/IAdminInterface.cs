@@ -8,8 +8,8 @@ namespace Backend.Services.AdminService
         
         Task<Response<PagedResponseDTO<AgendamentosResponseAdminsDTO>>> ListarAgendamentosEmEspecie(int page, int pageSize);
         Task<Response<string>> ConfirmarAgendamento(int idAgendamento, bool escolhaAprovacao);
-        Task<Response<string>> ApagarCliente(string ClientCpf);
-        Task<Response<string>> ReativarCliente(string ClientCpf);
+        Task<Response<string>> ApagarCliente(int idCliente);
+        Task<Response<string>> ReativarCliente(int idCliente);
         Task<Response<PagedResponseDTO<AgendamentosResponseAdminsDTO>>> ListarTodosAgendamentos(AgendamentoFiltroDTO filtro);
     }
 }

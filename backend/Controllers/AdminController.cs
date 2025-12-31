@@ -35,16 +35,17 @@ namespace Backend.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("DeletarCliente")]
-        public async Task<ActionResult> DeletarCliente(string CpfCliente)
+        [HttpDelete("DeletarCliente/{id}")]
+        public async Task<ActionResult> DeletarCliente(int id)
         {
-            var response = await _adminService.ApagarCliente(CpfCliente);
+            var response = await _adminService.ApagarCliente(id);
             return Ok(response);
         }
-        [HttpPost("ReativarCliente")]
-        public async Task<ActionResult> ReativarCliente(string CpfCliente)
+
+        [HttpPost("ReativarCliente/{id}")]
+        public async Task<ActionResult> ReativarCliente(int id)
         {
-            var response = await _adminService.ReativarCliente(CpfCliente);
+            var response = await _adminService.ReativarCliente(id);
             return Ok(response);
         }
         [HttpGet("ListarTodosAgendamentos")]
