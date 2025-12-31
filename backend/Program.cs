@@ -10,6 +10,7 @@ using Backend.Services.NotificationService;
 using Backend.Services.PagamentoService;
 using Backend.Services.PagBank;
 using Backend.Services.SenhaService;
+using Backend.Services.UsuarioService;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -99,6 +100,7 @@ builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAdminInterface, AdminService>();
+builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<CacambaService>();
 
 // Background services

@@ -6,8 +6,10 @@ namespace Backend.Services.AdminService
     public interface IAdminInterface
     {
         
-        Task<Response<List<AgendamentosResponseAdminsDTO>>> ListarAgendamentosEmEspecie(int page, int pageSize);
-
+        Task<Response<PagedResponseDTO<AgendamentosResponseAdminsDTO>>> ListarAgendamentosEmEspecie(int page, int pageSize);
         Task<Response<string>> ConfirmarAgendamento(int idAgendamento, bool escolhaAprovacao);
+        Task<Response<string>> ApagarCliente(string ClientCpf);
+        Task<Response<string>> ReativarCliente(string ClientCpf);
+        Task<Response<PagedResponseDTO<AgendamentosResponseAdminsDTO>>> ListarTodosAgendamentos(AgendamentoFiltroDTO filtro);
     }
 }

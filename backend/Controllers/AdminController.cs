@@ -1,6 +1,7 @@
 
 
 
+using Backend.Dto;
 using Backend.Services.AdminService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,25 @@ namespace Backend.Controllers
         {
             var response = await _adminService.ConfirmarAgendamento(idAgendamento, ConfirmarAgendamento);
 
+            return Ok(response);
+        }
+
+        [HttpDelete("DeletarCliente")]
+        public async Task<ActionResult> DeletarCliente(string CpfCliente)
+        {
+            var response = await _adminService.ApagarCliente(CpfCliente);
+            return Ok(response);
+        }
+        [HttpPost("ReativarCliente")]
+        public async Task<ActionResult> ReativarCliente(string CpfCliente)
+        {
+            var response = await _adminService.ReativarCliente(CpfCliente);
+            return Ok(response);
+        }
+        [HttpGet("ListarTodosAgendamentos")]
+        public async Task<ActionResult> ListarAgendamentos([FromQuery] AgendamentoFiltroDTO filtro)
+        {
+            var response = await _adminService.ListarTodosAgendamentos(filtro);
             return Ok(response);
         }
     }

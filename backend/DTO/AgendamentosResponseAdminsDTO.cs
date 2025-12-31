@@ -17,5 +17,10 @@ namespace Backend.Dto
         public AgendamentoStatus? StatusAgendamento { get; set; }
         public required DateTime DataInicial { get; set; }
         public required DateTime DataFinal { get; set; }
+        
+        // paginação
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 20;
+
     }
 }
