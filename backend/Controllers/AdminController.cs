@@ -22,8 +22,15 @@ namespace Backend.Controllers
         [HttpGet("ListarAgendamentosEmEspecie")]
         public async Task<ActionResult> ListarAgendamentosEmEspecie([FromQuery] int page = 1, [FromQuery] int pageSize = 20)        
         {
-
             var response = await _adminService.ListarAgendamentosEmEspecie(page, pageSize);
+            return Ok(response);
+        }
+
+        [HttpPut("ConfirmarAgendamento/{idAgendamento}")]
+        public async Task<ActionResult> ConfirmarAgendamento(int idAgendamento, bool ConfirmarAgendamento)
+        {
+            var response = await _adminService.ConfirmarAgendamento(idAgendamento, ConfirmarAgendamento);
+
             return Ok(response);
         }
     }

@@ -8,5 +8,6 @@ namespace Backend.Services.AdminService
         
         Task<Response<List<AgendamentosResponseAdminsDTO>>> ListarAgendamentosEmEspecie(int page, int pageSize);
 
+        Task<Response<string>> ConfirmarAgendamento(int idAgendamento, bool escolhaAprovacao);
     }
 }

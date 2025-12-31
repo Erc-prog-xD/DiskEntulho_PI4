@@ -74,6 +74,54 @@ namespace Backend.Services.AdminService
             }
             return response;
         }
+        
+        public async Task<Response<string>> ConfirmarAgendamento (int idAgendamento, bool escolhaAprovacao)
+        {
+            Response<string> response = new Response<string>();
+            try
+            {
+                var agendamento = await _context.Agendamento.Include(a => a.Pagamento).FirstOrDefaultAsync(a => a.Id == idAgendamento && a.DeletionDate == null);
+
+                if (agendamento == null || agendamento.Pagamento == null){
+
+                   response.Dados = null;
+                   response.Mensagem = "Agendamento ou pagamento não encontrado";
+                   response.Status = false; 
+                   return response;
+                }
+
+                if (escolhaAprovacao){
+                    agendamento.StatusAgendamento = AgendamentoStatus.Confirmado;
+                    agendamento.Pagamento.StatusPagamento = PagamentoStatusEnum.Aprovado;
+                    
+                    response.Status = true;
+                    response.Mensagem = "Agendamento e pagamento confirmado.";
+                    response.Dados = null;
+                }
+                else
+                {
+                    agendamento.Pagamento.StatusPagamento = PagamentoStatusEnum.Rejeitado;
+                    agendamento.StatusAgendamento = AgendamentoStatus.Rejeitado;
+
+                    response.Status = true;
+                    response.Mensagem = "Agendamento e pagamento rejeitado.";
+                    response.Dados = null;
+                }
+
+                await _context.SaveChangesAsync();
+
+            }
+            catch(Exception ex)
+            {
+                response.Dados = null;
+                response.Mensagem = $"Erro ao buscar os agendamentos: {ex.Message}";
+                response.Status = false; 
+            }
+
+            
+            return response;
+
+        }
     
     }
 }
