@@ -94,7 +94,7 @@ namespace Backend.Services.AgendamentoService
             return response;
         }
 
-        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitosClientLogado (int clientId)
+        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitosUsuarioLogado (int clientId)
         {
             Response<List<AgendamentoResponseDTO>> response = new Response<List<AgendamentoResponseDTO>>();
                 try
