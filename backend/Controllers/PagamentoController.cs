@@ -24,5 +24,13 @@ namespace Backend.Controllers
             var response = await _pagamentoService.AdicionarPagamento(pagamento);
             return Ok(response);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("AprovarPagamentoEspecie/{agendamentoId}")]
+        public async Task<ActionResult> AprovarPagamentoEspecie(int agendamentoId)
+        {
+            var response = await _pagamentoService.AprovarPagamentoEspecie(agendamentoId);
+            return Ok(response);
+        }
     }
 }
