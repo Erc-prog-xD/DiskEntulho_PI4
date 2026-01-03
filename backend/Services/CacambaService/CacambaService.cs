@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.CacambaService
 {
-    public class CacambaService : Cacamba
+    public class CacambaService : ICacambaInterface
     {
         private readonly AppDbContext _context;
         public CacambaService(AppDbContext context)
@@ -23,7 +23,7 @@ namespace Backend.Services.CacambaService
                     if (inicio >= fim)
                     {
                         response.Status = false;
-                        response.Mensage = "A data inicial deve ser menor que a data final.";
+                        response.Mensagem = "A data inicial deve ser menor que a data final.";
                         return response;
                     }
 
@@ -56,13 +56,13 @@ namespace Backend.Services.CacambaService
                         .ToListAsync();
 
                     response.Status = true;
-                    response.Mensage = "Lista de caçambas disponíveis encontrada.";
+                    response.Mensagem = "Lista de caçambas disponíveis encontrada.";
                     response.Dados = cacambasLivres;
                 }
                 catch (Exception ex)
                 {
                     response.Status = false;
-                    response.Mensage = "Erro ao buscar caçambas disponíveis: " + ex.Message;
+                    response.Mensagem = "Erro ao buscar caçambas disponíveis: " + ex.Message;
                 }
 
                 return response;
@@ -87,13 +87,13 @@ namespace Backend.Services.CacambaService
                 
                 await _context.SaveChangesAsync();
 
-                response.Mensage = "Caçamba cadastrada com sucesso";
+                response.Mensagem = "Caçamba cadastrada com sucesso";
                 response.Status = true;
                 response.Dados = cacamba;
             }
             catch (Exception ex)
             {
-                response.Mensage = "Falha no cadastro da caçamba: " + ex.Message;
+                response.Mensagem = "Falha no cadastro da caçamba: " + ex.Message;
                 response.Status = false;
                 response.Dados = null;
             }
@@ -102,26 +102,135 @@ namespace Backend.Services.CacambaService
         }
 
 
-        public async Task<List<Cacamba>> ListarTodos()
+       public async Task<Response<List<Cacamba>>> ListarTodos()
         {
-            return await _context.Cacamba
-                         .Where(c => c.DeletionDate == null)
-                         .ToListAsync();
+            Response<List<Cacamba>> response = new Response<List<Cacamba>>();
+
+            try
+            {
+                var listagem = await _context.Cacamba
+                    .Where(c => c.DeletionDate == null)
+                    .ToListAsync();
+
+                response.Status = true;
+                response.Mensagem = "Lista de caçambas.";
+                response.Dados = listagem;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Mensagem = "Erro ao listar caçambas: " + ex.Message;
+                response.Dados = null;
+            }
+
+            return response;
         }
-        // READ BY ID
-        public async Task<Cacamba?> ObterPorId(int id)
+
+
+        public async Task<Response<Cacamba>> ObterPorId(int id)
         {
-            return await _context.Cacamba.Where(c => c.Id == id && c.DeletionDate == null).FirstOrDefaultAsync();
+            Response<Cacamba> response = new Response<Cacamba>();
+
+            try
+            {
+                var cacamba = await _context.Cacamba
+                    .FirstOrDefaultAsync(c => c.Id == id && c.DeletionDate == null);
+
+                if (cacamba == null)
+                {
+                    response.Status = false;
+                    response.Mensagem = "Caçamba não encontrada.";
+                    response.Dados = null;
+                    return response;
+                }
+
+                response.Status = true;
+                response.Mensagem = "Caçamba encontrada.";
+                response.Dados = cacamba;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Mensagem = "Erro ao buscar caçamba: " + ex.Message;
+                response.Dados = null;
+                return response;
+            }
         }
         
-        public async Task<bool> Deletar(int id)
-        {
+        public async Task<Response<string>> Deletar(int id)
+        {   
+            Response<string> response = new Response<string>();
+            try
+            {
+                
             var cacamba = await _context.Cacamba.Where(c => c.Id == id && c.DeletionDate == null).FirstOrDefaultAsync();
-            if (cacamba == null) return false;
+            if (cacamba == null)
+            {
+                response.Dados = null;
+                response.Status = false;
+                response.Mensagem = "Caçamba não existe na base de dados";
+                return response;
+            }
 
             cacamba.DeletionDate = DateTime.Now;
             await _context.SaveChangesAsync();
-            return true;
+
+            response.Dados = null;
+            response.Status = true;
+            response.Mensagem = "Caçamba deletada!";
+            }
+            catch (Exception ex)
+            {
+                response.Mensagem = "Falha ao deletar:" + ex.Message;
+                response.Status = false;
+                response.Dados = null;
+            }
+
+            return response;
+        }
+
+       public async Task<Response<Cacamba>> Atualizar(int id, CacambaUpdateDTO dto)
+        {
+            Response<Cacamba> response = new Response<Cacamba>();
+
+            try
+            {
+                var cacamba = await _context.Cacamba
+                    .FirstOrDefaultAsync(c => c.Id == id && c.DeletionDate == null);
+
+                if (cacamba == null)
+                {
+                    response.Status = false;
+                    response.Mensagem = "Caçamba não encontrada.";
+                    response.Dados = null;
+                    return response;
+                }
+
+                if (!string.IsNullOrWhiteSpace(dto.Codigo))
+                    cacamba.Codigo = dto.Codigo;
+
+                if (dto.Tamanho.HasValue)
+                    cacamba.Tamanho = dto.Tamanho.Value;
+
+                if (dto.StatusCacamba.HasValue)
+                    cacamba.StatusCacamba = dto.StatusCacamba.Value;
+
+                _context.Cacamba.Update(cacamba);
+                await _context.SaveChangesAsync();
+
+                response.Status = true;
+                response.Mensagem = "Caçamba atualizada com sucesso.";
+                response.Dados = cacamba;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Mensagem = "Erro ao atualizar caçamba: " + ex.Message;
+                response.Dados = null;
+                return response;
+            }
         }
 
 

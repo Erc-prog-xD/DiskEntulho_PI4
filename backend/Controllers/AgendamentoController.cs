@@ -28,12 +28,11 @@ namespace Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("AgendamentosFeitos")]
-        public async Task<ActionResult> AgendamentosFeitos()
-        
+        [HttpGet("AgendamentosFeitosUsuarioLogado")]
+        public async Task<ActionResult> AgendamentosFeitosUsuarioLogado()
         {
             var clientId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
-            var response = await _agendamentoService.BuscarAgendamentosFeitos(clientId);
+            var response = await _agendamentoService.BuscarAgendamentosFeitosUsuarioLogado(clientId);
             return Ok(response);
         }
 

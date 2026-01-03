@@ -1,6 +1,7 @@
 using System.Collections;
 using Backend.Controllers;
 using Backend.Data;
+using Backend.Services.AdminService;
 using Backend.Services.AgendamentoService;
 using Backend.Services.AuthService;
 using Backend.Services.BackgroundServices;
@@ -9,6 +10,7 @@ using Backend.Services.NotificationService;
 using Backend.Services.PagamentoService;
 using Backend.Services.PagBank;
 using Backend.Services.SenhaService;
+using Backend.Services.UsuarioService;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -97,6 +99,8 @@ builder.Services.AddScoped<ISenhaInterface, SenhaService>();
 builder.Services.AddScoped<IPagamentoInterface, PagamentoService>();
 builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IAdminInterface, AdminService>();
+builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<CacambaService>();
 
 // Background services
