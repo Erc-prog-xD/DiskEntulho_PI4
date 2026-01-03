@@ -2,6 +2,7 @@ using Backend.Data;
 using Backend.Dto;
 using Backend.Enum;
 using Backend.Models;
+using Backend.Services.NotificationService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.AdminService
@@ -9,9 +10,12 @@ namespace Backend.Services.AdminService
     public class AdminService : IAdminInterface
     {
         private readonly AppDbContext _context;
-        public AdminService(AppDbContext context)
+
+        private readonly INotificationService _notificationService;
+        public AdminService(AppDbContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         public async Task<Response<PagedResponseDTO<AgendamentosResponseAdminsDTO>>> ListarAgendamentosEmEspecie(int page, int pageSize)
@@ -89,7 +93,15 @@ namespace Backend.Services.AdminService
             Response<string> response = new Response<string>();
             try
             {
-                var agendamento = await _context.Agendamento.Include(a => a.Pagamento).FirstOrDefaultAsync(a => a.Id == idAgendamento && a.DeletionDate == null);
+               var agendamento = await _context.Agendamento
+                .Include(a => a.Pagamento)
+                .Include(a => a.Client)
+                .FirstOrDefaultAsync(a =>
+                    a.Id == idAgendamento &&
+                    a.DeletionDate == null &&
+                    a.Pagamento != null &&
+                    a.Pagamento.TipoPagamento == PagamentoTypeEnum.Especie
+                );
 
                 if (agendamento == null || agendamento.Pagamento == null){
 
@@ -103,6 +115,8 @@ namespace Backend.Services.AdminService
                     agendamento.StatusAgendamento = AgendamentoStatus.Confirmado;
                     agendamento.Pagamento.StatusPagamento = PagamentoStatusEnum.Aprovado;
                     
+                    await _notificationService.CriarNotificacaoAsync(agendamento.Id, agendamento.Client.Id, "Agendamento e pagamento confirmado", AgendamentoStatus.Confirmado);
+
                     response.Status = true;
                     response.Mensagem = "Agendamento e pagamento confirmado.";
                     response.Dados = null;
@@ -111,6 +125,8 @@ namespace Backend.Services.AdminService
                 {
                     agendamento.Pagamento.StatusPagamento = PagamentoStatusEnum.Rejeitado;
                     agendamento.StatusAgendamento = AgendamentoStatus.Rejeitado;
+
+                    await _notificationService.CriarNotificacaoAsync(agendamento.Id, agendamento.Client.Id, "Agendamento e pagamento rejeitado", AgendamentoStatus.Rejeitado);
 
                     response.Status = true;
                     response.Mensagem = "Agendamento e pagamento rejeitado.";
