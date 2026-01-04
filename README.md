@@ -4,7 +4,7 @@
 
 Sistema completo para locação e gerenciamento de caçambas de entulho, com painel administrativo e integração de pagamentos.
 
-![Logo do Projeto](./img/Swagger.png)
+![Api do Projeto](./img/Swagger.png)
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -26,7 +26,18 @@ O projeto está totalmente containerizado. Para rodar, basta executar:
 1. Clone o repositório:
    ```bash
    git clone [https://github.com/seu-usuario/DiskEntulho_PI4.git](https://github.com/seu-usuario/DiskEntulho_PI4.git)
-   cd DiskEntulho_PI4
+   cd DiskEntulho_PI4 
+   ```
+
+2. Suba os containers (Frontend, API e Banco):
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. Acesse a aplicação:
+   - Frontend: http://localhost:3000
+   - Swagger (API): http://localhost:5036/swagger (ou a porta configurada no docker-compose)
 
 ## 🔐 Autenticação e Segurança
 
@@ -57,3 +68,89 @@ Para testar endpoints com cadeado 🔒 no Swagger:
 4. Insira o valor no formato: `Bearer SEU_TOKEN_COPIADO`.
 ![3Auth](./img/Auth3.png)
 5. Clique em **Authorize**. Agora você tem acesso às rotas de Cliente.
+
+### 👑 Como Criar um Usuário Admin
+
+Por questões de segurança, todo novo usuário cadastrado via API ou Frontend nasce com o perfil **Cliente** (`isAdmin = 0`). Para elevar o nível de acesso para **Admin**, é necessário acesso direto ao Banco de Dados.
+
+1. **Crie o usuário** normalmente pela rota `/api/Auth/Register`.
+2. **Conecte-se ao SQL Server** (via SSMS, Azure Data Studio ou DBeaver).
+   - **Server:** `localhost,1433`
+   - **User:** `sa`
+   - **Password:** `1234` (Conforme configurado no Docker)
+   ![BD](./img/BDCapturar2.png)
+
+
+3. **Execute o comando SQL** para alterar a permissão:
+   ```sql
+   -- Substitua 'seu@email.com' pelo email do usuário cadastrado
+   UPDATE DiskEntulhoDB..Client SET isAdmin = 1 WHERE Email = 'seu@email.com';
+   ```   
+   ![BD1](./img/BD2.png)
+
+4. **Gere um novo Token:** Após a alteração, faça login novamente para gerar um token atualizado com as permissões de Admin.
+
+## 🗑️ Gerenciamento de Caçambas
+
+Módulo responsável pelo inventário das caçambas. O sistema diferencia operações de consulta (disponíveis para Clientes) e operações de gestão (exclusivas para Admins).
+
+### 🔍 Verificar Disponibilidade (Inteligente)
+
+O sistema possui uma lógica que cruza as datas solicitadas com os agendamentos existentes para retornar apenas caçambas livres.
+
+- **Rota:** `GET /api/Cacamba/CacambasDisponiveis?inicio=AAAA-MM-DD&fim=AAAA-MM-DD`
+- **Permissão:** Cliente ou Admin
+- **Lógica:**
+  - O sistema verifica agendamentos com status *Criado*, *Processando* ou *Confirmado*.
+  - Retorna apenas caçambas que **não** conflitam com o intervalo de datas informado.
+  - Valida se a `dataInicial` é menor que a `dataFinal`.
+
+### 🛠️ Gestão de Inventário (Exclusivo Admin)
+
+Apenas usuários com perfil **Admin** podem cadastrar, editar ou remover caçambas do sistema.
+
+- **Cadastrar:** `POST /api/Cacamba/CadastrarCacamba`
+- **Atualizar:** `PUT /api/Cacamba/AtualizarCacamba/{id}`
+- **Remover:** `DELETE /api/Cacamba/{id}` (Soft Delete - Apenas marca a data de exclusão)
+
+**Exemplo de JSON para Cadastro:**
+```json
+{
+   "codigo": "CA1",
+  "tamanho": 1
+}
+```
+![CA1](./img/CA1.png)
+![CA2](./img/CA2.png)
+
+## 📅 Agendamento de Caçambas
+
+O sistema permite que clientes autenticados solicitem a locação de caçambas. O fluxo exige que o usuário esteja logado e informe os dados do local e período.
+
+### 📝 Criar um Agendamento
+
+- **Rota:** `POST /api/Agendamento/CadastrarAgendamento`
+- **Permissão:** Cliente ou Admin (Requer Token Bearer)
+- **Regras:**
+  - `DataInicial` e `DataFinal` devem ser datas futuras.
+  - `DataInicial` deve ser anterior à `DataFinal`.
+  - O `CacambaId` deve ser de uma caçamba existente no banco.
+
+**Exemplo de JSON (Body):**
+```json
+{
+  "cacambaId": 1,
+  "dataInicial": "2026-02-10T08:00:00",
+  "dataFinal": "2026-02-15T18:00:00",
+  "coord_X": -23.550520,
+  "coord_Y": -46.633308,
+  "endereco": {
+    "rua": "Rua das Pedrinhas, 101",
+    "bairro": "Centro",
+    "cidade": "Crateús",
+    "estado": "CE",
+    "descricaoLocal": "Colocar na vaga de garagem",
+    "referencia": ""
+  }
+}
+```
