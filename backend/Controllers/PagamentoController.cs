@@ -6,8 +6,8 @@ using Backend.Dto;
 
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class PagamentoController : ControllerBase
     {
         private readonly IPagamentoInterface _pagamentoService;
