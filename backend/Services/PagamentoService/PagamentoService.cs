@@ -139,28 +139,28 @@ namespace Backend.Services.PagamentoService
                 // 2. Validações básicas
                 if (agendamento == null)
                 {
-                    response.Mensage = "Agendamento não encontrado.";
+                    response.Mensagem = "Agendamento não encontrado.";
                     response.Status = false;
                     return response;
                 }
 
                 if (agendamento.Pagamento == null)
                 {
-                    response.Mensage = "Este agendamento não possui dados de pagamento vinculados.";
+                    response.Mensagem = "Este agendamento não possui dados de pagamento vinculados.";
                     response.Status = false;
                     return response;
                 }
 
                 if (agendamento.Pagamento.TipoPagamento != PagamentoTypeEnum.Especie)
                 {
-                    response.Mensage = "Erro: Este método aprova apenas pagamentos em Espécie.";
+                    response.Mensagem = "Erro: Este método aprova apenas pagamentos em Espécie.";
                     response.Status = false;
                     return response;
                 }
 
                 if (agendamento.Pagamento.StatusPagamento == PagamentoStatusEnum.Aprovado) 
                 {
-                    response.Mensage = "Este pagamento já foi aprovado anteriormente.";
+                    response.Mensagem = "Este pagamento já foi aprovado anteriormente.";
                     response.Status = false;
                     return response;
                 }
@@ -180,7 +180,7 @@ namespace Backend.Services.PagamentoService
 
                 return new Response<Agendamento>
                 {
-                    Mensage = "Pagamento em espécie aprovado com sucesso!",
+                    Mensagem = "Pagamento em espécie aprovado com sucesso!",
                     Status = true,
                     Dados = agendamento
                 };
@@ -189,7 +189,7 @@ namespace Backend.Services.PagamentoService
             {
                 return new Response<Agendamento>
                 {
-                    Mensage = $"Erro ao aprovar pagamento: {ex.Message}",
+                    Mensagem = $"Erro ao aprovar pagamento: {ex.Message}",
                     Status = false
                 };
             }
