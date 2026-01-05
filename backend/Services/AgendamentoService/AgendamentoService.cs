@@ -19,7 +19,82 @@ namespace Backend.Services.AgendamentoService
             _notificationService = notificationService;
         }
 
-        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos(int clientId)
+        public async Task<Response<Agendamento>> CadastrarAgendamento(int clientId, AgendamentoCreateDTO agendamento)
+        {
+            Response<Agendamento> response = new Response<Agendamento>();
+            try
+            {
+
+                // 🔹 Verificação de datas
+                if (agendamento.DataInicial <= DateTime.Now || agendamento.DataFinal <= DateTime.Now)
+                {
+                    response.Status = false;
+                    response.Mensagem = "As datas devem ser futuras.";
+                    return response;
+                }
+
+                if (agendamento.DataInicial >= agendamento.DataFinal)
+                {
+                    response.Status = false;
+                    response.Mensagem = "A data inicial deve ser menor que a data final.";
+                    return response;
+                }
+                // Verifica se a caçamba existe
+                var cacamba = await _context.Cacamba.FindAsync(agendamento.CacambaId);
+                if (cacamba == null)
+                {
+                    response.Status = false;
+                    response.Mensagem = $"Caçamba com ID {agendamento.CacambaId} não encontrada.";
+                    response.Dados = null;
+                    return response;
+                }
+
+                // 🔹 Busca o cliente no banco
+                var client = await _context.Client.FindAsync(clientId);
+                if (client == null)
+                {
+                    response.Status = false;
+                    response.Mensagem = "Cliente não encontrado.";
+                    return response;
+                }
+
+                // Cria uma nova instância da entidade Agendamento com base no DTO
+                var novoAgendamento = new Agendamento
+                {
+                    Coord_X = agendamento.Coord_X,
+                    Coord_Y = agendamento.Coord_Y,
+                    Endereco = agendamento.Endereco,
+                    Client = client,
+                    Cacamba = cacamba,
+                    DataInicial = agendamento.DataInicial,
+                    DataFinal = agendamento.DataFinal
+                };
+
+                // Adiciona no contexto e salva
+                _context.Agendamento.Add(novoAgendamento);
+                await _context.SaveChangesAsync();
+
+                await _notificationService.CriarNotificacaoAsync(
+                    novoAgendamento.Id,
+                    client.Id,
+                    "Agendamento criado com sucesso!",
+                    novoAgendamento.StatusAgendamento);
+
+                response.Status = true;
+                response.Mensagem = "Agendamento cadastrado com sucesso!";
+                response.Dados = novoAgendamento;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Mensagem = $"Erro ao cadastrar agendamento: {ex.Message}";
+                response.Dados = null;
+            }
+
+            return response;
+        }
+
+        public async Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitosUsuarioLogado (int clientId)
         {
             Response<List<AgendamentoResponseDTO>> response = new Response<List<AgendamentoResponseDTO>>();
                 try
@@ -30,7 +105,7 @@ namespace Backend.Services.AgendamentoService
                 if (client == null)
                 {
                     response.Status = false;
-                    response.Mensage = "Cliente não encontrado.";
+                    response.Mensagem = "Cliente não encontrado.";
                     return response;
                 }
 
@@ -69,94 +144,19 @@ namespace Backend.Services.AgendamentoService
                 }).ToList();
 
                     response.Status = true;
-                    response.Mensage = "Agendamentos encontrados.";
+                    response.Mensagem = "Agendamentos encontrados.";
                     response.Dados = agendamentosDto;
                 }
 
             catch (Exception ex)
             {
                 response.Status = false;
-                response.Mensage = "Erro ao buscar agendamentos: " + ex.Message;
+                response.Mensagem = "Erro ao buscar agendamentos: " + ex.Message;
                 response.Dados = null;
             }
 
             return response;
 
-        }
-
-        public async Task<Response<Agendamento>> CadastrarAgendamento(int clientId,AgendamentoCreateDTO agendamento)
-        {
-            Response<Agendamento> response = new Response<Agendamento>();
-            try
-            {
-
-                // 🔹 Verificação de datas
-                if (agendamento.DataInicial <= DateTime.Now || agendamento.DataFinal <= DateTime.Now)
-                {
-                    response.Status = false;
-                    response.Mensage = "As datas devem ser futuras.";
-                    return response;
-                }
-
-                if (agendamento.DataInicial >= agendamento.DataFinal)
-                {
-                    response.Status = false;
-                    response.Mensage = "A data inicial deve ser menor que a data final.";
-                    return response;
-                }
-                // Verifica se a caçamba existe
-                var cacamba = await _context.Cacamba.FindAsync(agendamento.CacambaId);
-                if (cacamba == null)
-                {
-                    response.Status = false;
-                    response.Mensage = $"Caçamba com ID {agendamento.CacambaId} não encontrada.";
-                    response.Dados = null;
-                    return response;
-                }
-
-                // 🔹 Busca o cliente no banco
-                var client = await _context.Client.FindAsync(clientId);
-                if (client == null)
-                {
-                    response.Status = false;
-                    response.Mensage = "Cliente não encontrado.";
-                    return response;
-                }
-
-                // Cria uma nova instância da entidade Agendamento com base no DTO
-                var novoAgendamento = new Agendamento
-                {
-                    Coord_X = agendamento.Coord_X,
-                    Coord_Y = agendamento.Coord_Y,
-                    Endereco = agendamento.Endereco,
-                    Client = client,
-                    Cacamba = cacamba,
-                    DataInicial = agendamento.DataInicial,
-                    DataFinal = agendamento.DataFinal
-                };
-
-                // Adiciona no contexto e salva
-                _context.Agendamento.Add(novoAgendamento);
-                await _context.SaveChangesAsync();
-
-                await _notificationService.CriarNotificacaoAsync(
-                    novoAgendamento.Id,
-                    client.Id,
-                    "Agendamento criado com sucesso!",
-                    novoAgendamento.StatusAgendamento);
-
-                response.Status = true;
-                response.Mensage = "Agendamento cadastrado com sucesso!";
-                response.Dados = novoAgendamento;
-            }
-            catch (Exception ex)
-            {
-                response.Status = false;
-                response.Mensage = $"Erro ao cadastrar agendamento: {ex.Message}";
-                response.Dados = null;
-            }
-
-            return response;
         }
         
     }
