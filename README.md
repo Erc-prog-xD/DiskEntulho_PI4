@@ -176,12 +176,8 @@ Para cadastrar novos preços ou alterar valores existentes, conecte-se ao banco 
 
 Caso tenha criado um novo tamanho de caçamba (ex: 5m³), cadastre o preço correspondente:
 
-```sql
--- Exemplo: Caçamba de 1m³ custando R$ 1,00
-INSERT INTO DiskEntulhoDB..Preco VALUES (1, 1);
-```
-
 ![Preco](./img/Preco.png)
+![Preco](./img/PrecoBD.png)
 
 ## 📅 Agendamento de Caçambas
 

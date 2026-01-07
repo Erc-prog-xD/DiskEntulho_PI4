@@ -21,17 +21,25 @@ namespace Backend.Services.PrecoService
 
             try
             {
-                // CORREÇÃO AQUI: Convertendo o int do DTO para o Enum do Banco
+                // 1. VALIDAÇÃO DE ENUM:
+                if (!System.Enum.IsDefined(typeof(CacambaTamanhoEnum), precoDto.Tamanho))
+                {
+                    response.Status = false;
+                    response.Mensagem = "Tamanho inválido. Use: 0 (Pequeno), 1 (Médio) ou 2 (Grande).";
+                    return response;
+                }
+
+                // Faz a conversão segura de int para Enum
                 var tamanhoEnum = (CacambaTamanhoEnum)precoDto.Tamanho;
 
-                // 1. Verifica se já existe um preço para esse tamanho
+                // 2. VERIFICAÇÃO DE DUPLICIDADE
                 var precoExistente = await _context.Preco
-                    .FirstOrDefaultAsync(p => p.Tamanho == tamanhoEnum); // Agora compara Enum com Enum!
+                    .FirstOrDefaultAsync(p => p.Tamanho == tamanhoEnum);
 
                 if (precoExistente != null)
                 {
                     response.Status = false;
-                    response.Mensagem = $"Já existe um preço cadastrado para o tamanho {precoDto.Tamanho}.";
+                    response.Mensagem = $"Já existe um preço cadastrado para o tamanho {tamanhoEnum}.";
                     return response;
                 }
 

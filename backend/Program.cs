@@ -9,6 +9,7 @@ using Backend.Services.CacambaService;
 using Backend.Services.NotificationService;
 using Backend.Services.PagamentoService;
 using Backend.Services.PagBank;
+using Backend.Services.PrecoService;
 using Backend.Services.SenhaService;
 using Backend.Services.UsuarioService;
 using DotNetEnv;
@@ -102,6 +103,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAdminInterface, AdminService>();
 builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<CacambaService>();
+builder.Services.AddScoped<IPrecoInterface, PrecoService>();
 
 // Background services
 builder.Services.AddHostedService<AgendamentoExpirationService>();

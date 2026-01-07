@@ -2,7 +2,9 @@
 
 
 using Backend.Dto;
+using Backend.DTO;
 using Backend.Services.AdminService;
+using Backend.Services.PrecoService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +16,13 @@ namespace Backend.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminInterface _adminService;
+        private readonly IPrecoInterface _precoInterface; // 2. Declaramos a interface aqui
 
-        public AdminController(IAdminInterface adminService)
+        // 3. Atualizamos o construtor para receber as DUAS interfaces
+        public AdminController(IAdminInterface adminService, IPrecoInterface precoInterface)
         {
             _adminService = adminService;
+            _precoInterface = precoInterface; // 4. Injetamos o serviço
         }
 
         [HttpGet("ListarAgendamentosEmEspecie")]
@@ -54,6 +59,15 @@ namespace Backend.Controllers
             var response = await _adminService.ListarTodosAgendamentos(filtro);
             return Ok(response);
         }
+
+        // 5. Agora o método funciona pois _precoInterface existe!
+        [HttpPost("CadastrarPreco")]
+        public async Task<ActionResult> CadastrarPreco(PrecoDTO precoBody)
+        {
+            var response = await _precoInterface.CadastrarPreco(precoBody);
+            return Ok(response);
+        }
+
     }
 
 
