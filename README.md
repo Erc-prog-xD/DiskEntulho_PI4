@@ -4,6 +4,7 @@
 
 Sistema completo para locação e gerenciamento de caçambas de entulho, com painel administrativo e integração de pagamentos.
 
+![Logo do Projeto](./frontend/public/assets/disk-entulho.png)
 ![Swagger do Projeto](./img/Swagger.png)
 
 ## 🚀 Tecnologias Utilizadas

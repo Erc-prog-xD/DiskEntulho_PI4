@@ -1,6 +1,6 @@
 using Backend.Enum;
 
-namespace backend.Models
+namespace Backend.Models
 {
     public class Preco
     {
