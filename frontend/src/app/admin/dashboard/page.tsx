@@ -60,7 +60,7 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     placeholder="Digite seu nome"
-                    className="w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="text-gray-700 w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
                 </div>
 
@@ -71,7 +71,7 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     placeholder="Digite seu número de telefone"
-                    className="w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="text-gray-700 w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
                 </div>
 
@@ -82,7 +82,7 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     placeholder="Digite o endereço de entrega"
-                    className="w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="text-gray-700 w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
                 </div>
 
@@ -92,7 +92,7 @@ export default function DashboardPage() {
                   </label>
                   <textarea
                     placeholder="Digite alguma observação que deseja fazer"
-                    className="w-full min-h-[120px] rounded-lg border border-gray-300 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="text-gray-700 w-full min-h-[120px] rounded-lg border border-gray-300 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
                 </div>
               </div>
@@ -151,13 +151,13 @@ export default function DashboardPage() {
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                 >
-                    Escolher caçamba
+                    Selecionar data
                 </button>
                 </div>
-                {/* BOTÃO */}
+                
                 <button
                   onClick={() => router.push('/cacambas')}
-                  className="mt-6 w-full h-12 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                  className="mt-6 w-full lg:col-span-2 h-12 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
                 >
                   Escolher caçamba
                 </button>
