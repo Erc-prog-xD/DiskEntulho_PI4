@@ -140,7 +140,7 @@ export function LoginForm() {
       if (role === "Admin") {
          window.location.href = "/admin/dashboard";
        } else {
-         window.location.href = "/usuario/agendamentos";
+         window.location.href = "/usuario/dashboard";
       }
 
     } catch (error) {

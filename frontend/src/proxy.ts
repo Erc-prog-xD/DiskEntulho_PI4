@@ -44,7 +44,7 @@ export function proxy(request: NextRequest) {
     try {
       const payload = jwtDecode<DotNetJwtPayload>(token);
       const role = payload[ROLE_CLAIM];
-      const dest = role === "Admin" ? "/admin/dashboard" : "/usuario/agendamentos";
+      const dest = role === "Admin" ? "/admin/dashboard" : "/usuario/dashboard";
       return NextResponse.redirect(new URL(dest, request.url));
     } catch {
       return NextResponse.redirect(new URL("/auth/login", request.url));
