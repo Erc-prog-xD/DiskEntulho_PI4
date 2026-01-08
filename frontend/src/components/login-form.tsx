@@ -4,12 +4,19 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { jwtDecode } from 'jwt-decode';
 
 
 interface FormErrors {
   cpf?: string;
   password?: string;
 }
+
+type DotNetJwtPayload = {
+  Cpf?: string;
+  exp?: number;
+  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: "Admin" | "Client";
+};
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -110,9 +117,31 @@ export function LoginForm() {
       }
 
       const data = await response.json();
-      console.log("Login OK:", data);
 
-      localStorage.setItem("token", data.token);
+       if (!data.dados) {
+        alert("Login OK, mas o servidor não retornou token.");
+        return;
+      }
+      console.log("Login OK:", data);
+    
+      localStorage.setItem("token", data.dados);
+      document.cookie = `token=${data.dados}; path=/; samesite=lax`;
+
+      let payload: DotNetJwtPayload | null = null;
+      try {
+        payload = jwtDecode<DotNetJwtPayload>(data.dados);
+      } catch {
+        alert("Token inválido/inesperado.");
+        return;
+      }
+      const role =
+        payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      
+      if (role === "Admin") {
+         window.location.href = "/admin/dashboard";
+       } else {
+         window.location.href = "/usuario/agendamentos";
+      }
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
@@ -228,6 +257,7 @@ export function LoginForm() {
             priority
           />
         </div>
+
       </div>
     </div>
   );
