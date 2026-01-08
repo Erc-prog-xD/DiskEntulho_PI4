@@ -155,33 +155,35 @@ Apenas usuários com perfil **Admin** podem cadastrar, editar ou remover caçamb
   "tamanho": 1
 }
 ```
-![CA1](./img/CA1.png)
-![CA2](./img/CA2.png)
+Resposta esperada:
+![Cacamba](./img/Cacamba.png)
+![CacambaBD](./img/CacambaBD.png)
 
-## 💲 Tabela de Preços
+## 💲 Gerenciamento de Preços
 
-Atualmente, a definição de preços por tamanho de caçamba é gerenciada diretamente no Banco de Dados. O sistema utiliza esses valores automaticamente na hora de calcular o custo do agendamento.
+O sistema permite que administradores definam o valor da locação baseando-se no tamanho da caçamba. Esta rota é protegida e valida estritamente os tamanhos permitidos pelo sistema.
 
-### 🛠️ Como Ajustar Preços (Via SQL)
+### 🏷️ Cadastrar Novo Preço
 
-Para cadastrar novos preços ou alterar valores existentes, conecte-se ao banco SQL Server e execute os comandos abaixo.
+Define quanto custa locar uma caçamba de determinado tamanho. O sistema impede a criação de preços duplicados para o mesmo tamanho.
 
-**Tabela:** `Preco`
-**Colunas:**
+- **Rota:** `POST /api/Admin/CadastrarPreco`
+- **Permissão:** Exclusivo Admin (Requer Token)
+- **Regra de Tamanho:** O campo `tamanho` aceita apenas os números correspondentes ao Enum do sistema:
+  - `0` = Pequeno
+  - `1` = Médio
+  - `2` = Grande
 
-- `Valor` (Decimal/Float): O preço em reais.
-- `Tamanho` (Int): O tamanho da caçamba correspondente (ex: 3, 5, 7 m³).
-
-#### 1. Cadastrar um Novo Preço
-
-Caso tenha criado um novo tamanho de caçamba (ex: 5m³), cadastre o preço correspondente:
-
+**Exemplo de JSON (Body):**
+```json
+{
+  "valor": 250.00,
+  "tamanho": 1
+}
+```
+Resposta esperada:
 ![Preco](./img/Preco.png)
-![Preco](./img/PrecoBD.png)
-
-## 📅 Agendamento de Caçambas
-
-O sistema permite que clientes autenticados solicitem a locação de caçambas. O fluxo exige que o usuário esteja logado e informe os dados do local e período.
+![PrecoBD](./img/PrecoBD.png)
 
 ### 📝 Criar um Agendamento
 
@@ -250,3 +252,44 @@ Para que a integração funcione, o arquivo `.env` deve conter as credenciais do
 PAGBANK_TOKEN=seu_token_de_sandbox
 PAGBANK_URL=[https://sandbox.api.pagseguro.com](https://sandbox.api.pagseguro.com) 
 ```
+
+## 💸 Fluxo de Pagamento e Aprovação
+
+O sistema implementa um fluxo de pagamento em duas etapas para modalidades que exigem verificação manual (como Pagamento em Espécie - Tipo 0).
+
+### Passo 1: Solicitação de Pagamento (Cliente)
+O cliente informa como deseja pagar. Neste momento, o sistema calcula o valor final, vincula o pagamento ao agendamento e coloca o pedido em análise.
+
+- **Rota:** `POST /api/Pagamento/AddPagamento`
+- **Permissão:** Cliente
+- **Comportamento:**
+  - O `StatusAgendamento` muda para **1 (Processando)**.
+  - O `StatusPagamento` é criado como **1 (Pendente)**.
+  - Uma notificação é gerada: *"Pagamento adicionado... agora estamos processando seu agendamento"*.
+
+**Payload Exemplo:**
+```json
+{
+  "idAgendamento": 2,
+  "tipoPagamento": 0  // 0 = Espécie
+}
+```
+![Pagamento](./img/Pagamento.png)
+![PagamentoBD](./img/PagamentoBD.png)
+
+### Passo 2: Confirmação Financeira (Admin)
+Após receber o valor ou confirmar a transação, o Administrador deve liberar o agendamento manualmente.
+
+- **Rota:** `PUT /api/Admin/ConfirmarAgendamento/{idAgendamento}?ConfirmarAgendamento=true`
+- **Permissão:** Admin
+- **Comportamento:**
+  - O `StatusAgendamento` muda para 3 (Confirmado).
+
+  - O `StatusPagamento` muda para 3 (Aprovado).
+
+  - O cliente recebe a notificação final: "Agendamento e pagamento confirmado".
+    
+  ![Pagamento0](./img/Pagamento0.png)
+  ![Pagamento0BD](./img/Pagamento0BD.png)
+
+Nota Técnica: O endpoint de confirmação está centralizado no AdminController, garantindo que apenas usuários com a role Admin possam validar transações financeiras manuais.
