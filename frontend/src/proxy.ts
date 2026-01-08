@@ -20,26 +20,22 @@ export function proxy(request: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
   const isUserRoute = pathname.startsWith("/usuario");
 
-  // Se NÃO está logado e tenta /admin/* -> login + returnTo
   if (isAdminRoute && !token) {
     const url = new URL("/auth/login", request.url);
     url.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(url);
   }
-  // se Não está logado e tenta /usuaro/* -> login + returnTo
+
   if(!token && isUserRoute){
     const url = new URL("/auth/login", request.url);
     url.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(url);
   }
 
-  // ✅ Se NÃO está logado, pode acessar /auth/*
   if (!token && isAuthRoute){
     return NextResponse.next();
   } 
   
-
-  // ✅ Se está logado e tenta /auth/* -> manda pro lugar certo
   if (token && isAuthRoute) {
     try {
       const payload = jwtDecode<DotNetJwtPayload>(token);
@@ -51,7 +47,6 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // ✅ Proteger /admin/*: precisa role Admin
   if (isAdminRoute && token) {
     try {
       const payload = jwtDecode<DotNetJwtPayload>(token);

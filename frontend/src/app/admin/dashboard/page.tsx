@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { DashboardHeader } from "@/src/components/dashboard-header";
-import { DashboardSidebar } from "@/src/components/dashboard-sidebar";
+import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar";
 import { useState } from 'react';
 
 export default function DashboardPage() {
@@ -36,7 +36,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar />
+      <AdminDashboardSidebar />
 
       <div className="flex-1">
         <DashboardHeader />
