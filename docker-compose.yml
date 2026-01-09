@@ -39,3 +39,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  nginx:
+    image: nginx:latest
+    container_name: diskentulho_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80" # Acessa via localhost (sem porta)
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - default
