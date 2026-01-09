@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { Card, CardContent } from "./ui/card"
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; 
 
 interface DumpsterCardProps {
   name: string
@@ -13,16 +13,26 @@ interface DumpsterCardProps {
 
 export function CacambaCard({ name, volume, price, image }: DumpsterCardProps) {
   const router = useRouter();
+  const pathname = usePathname(); 
+
+  const handleNavigation = () => {
+    if (pathname?.startsWith('/admin')) {
+      router.push('/admin/cacambas/confirmar');
+    } else {
+      router.push('/cacambas/confirmar');
+    }
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-100">
       <CardContent className="p-0">
-        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-lg p-8 aspect-video flex items-center justify-center">
+        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-lg p-2 aspect-video flex items-center justify-center">
           <Image 
             src={image || "/placeholder.svg"} 
             alt={name} 
             width={220} 
             height={160} 
-            className="object-contain drop-shadow-lg" 
+            className="w-full h-full object-contain" 
           />
         </div>
         <div className="p-5 space-y-4">
@@ -38,8 +48,9 @@ export function CacambaCard({ name, volume, price, image }: DumpsterCardProps) {
               <span className="text-base font-bold text-gray-900">{price}</span>
             </div>
           </div>
+        
         <button
-          onClick={() => router.push('/cacambas/confirmar')}
+          onClick={handleNavigation}
           className="w-full h-12 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
         >
           Detalhes

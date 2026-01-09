@@ -1,6 +1,6 @@
 import { DashboardHeader } from "@/src/components/dashboard-header"
-import { DashboardSidebar } from "@/src/components/dashboard-sidebar"
 import { CacambaCard } from "@/src/components/caçamba-card"
+import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar"
 
 export default function Cacambas() {
   const cacambas = [
@@ -50,7 +50,7 @@ export default function Cacambas() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar />
+      <AdminDashboardSidebar />
       <div className="flex-1">
         <DashboardHeader />
         <main className="p-8">

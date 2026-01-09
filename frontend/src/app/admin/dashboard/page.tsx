@@ -156,7 +156,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <button
-                  onClick={() => router.push('/cacambas')}
+                  onClick={() => router.push('/admin/cacambas')}
                   className="mt-6 w-full lg:col-span-2 h-12 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
                 >
                   Escolher caçamba

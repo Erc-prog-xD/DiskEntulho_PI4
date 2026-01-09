@@ -1,7 +1,7 @@
 "use client" // Necessário pois agora usamos useState
 
 import { useState } from "react"
-import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRoundX, UserRoundCheck, TextAlignStart, List } from "lucide-react"
+import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig,  } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 import Image from "next/image"
 import Link from "next/link" 
@@ -37,7 +37,7 @@ export function AdminDashboardSidebar() {
       ]
     },
     { 
-      icon: List, 
+      icon: ChartColumnBig, 
       label: "Ações", 
       active: false,
       isDropdown: true, 
