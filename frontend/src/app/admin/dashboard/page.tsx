@@ -8,7 +8,7 @@ import { useState } from 'react';
 export default function DashboardPage() {
     const router = useRouter();
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
-    const [currentMonth, setCurrentMonth] = useState(3); // Abril (0 = Janeiro)
+    const [currentMonth, setCurrentMonth] = useState(3); 
     const [currentYear, setCurrentYear] = useState(2021);
     const months = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
