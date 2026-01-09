@@ -31,7 +31,7 @@ export function AdminDashboardSidebar() {
       isOpen: isCacambasOpen,
       toggle: () => setIsCacambasOpen(!isCacambasOpen),
       subItems: [
-        { label: "Cadastrar Caçamba", href: "/admin/cacambas/novo", icon: Plus },
+        { label: "Cadastrar Caçamba", href: "/admin/cacambas/cadastrar", icon: Plus },
         { label: "Atualizar Caçamba", href: "/admin/cacambas/editar", icon: RefreshCw },
         { label: "Deletar Caçamba", href: "/admin/cacambas/deletar", icon: Trash },
       ]
