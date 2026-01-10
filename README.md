@@ -5,7 +5,7 @@
 Sistema completo para locação e gerenciamento de caçambas de entulho, com painel administrativo e integração de pagamentos.
 
 ![Logo do Projeto](./frontend/public/assets/disk-entulho.png)
-![Swagger do Projeto](./img/Swagger.png)
+![Swagger do Projeto](./img/Swagger.PNG)
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -183,7 +183,7 @@ Define quanto custa locar uma caçamba de determinado tamanho. O sistema impede 
 ```
 Resposta esperada:
 ![Preco](./img/Preco.png)
-![PrecoBD](./img/PrecoBD.png)
+![PrecoBD](./img/PrecoBD.PNG)
 
 ### 📝 Criar um Agendamento
 
@@ -215,7 +215,7 @@ Resposta esperada:
 ```
 Resposta esperada:
 ![Agendamento](./img/Agendamento.png)
-![AgendamentoBD](./img/AgendamentoBD.png)
+![AgendamentoBD](./img/AgendamentoBD.PNG)
 
 ## 💳 Sistema de Pagamentos
 
