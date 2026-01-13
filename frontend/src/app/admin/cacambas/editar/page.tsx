@@ -3,7 +3,7 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar";
 import { DashboardHeader } from "@/src/components/dashboard-header";
-import { Save, UploadCloud, Search, Edit3 } from "lucide-react"; // Removidos ícones de estatísticas
+import { Save, UploadCloud, Search, Edit3 } from "lucide-react"; 
 import Image from 'next/image';
 
 const MOCK_DB = [
@@ -89,11 +89,10 @@ export default function AtualizarCacambaPage() {
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 flex-1 min-h-0">
             
-            {/* COLUNA ESQUERDA (FORMULÁRIO) - Mantém scroll interno se necessário */}
             <div className="xl:col-span-2 h-full min-h-0">
-              <form className="bg-white p-8 rounded-xl shadow-sm h-full flex flex-col border border-gray-100 overflow-hidden">
+              <form className="bg-white p-8 rounded-xl shadow-sm flex flex-col border border-gray-100 overflow-hidden">
                 
-                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                <div className="overflow-y-auto custom-scrollbar pr-2">
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="col-span-1 md:col-span-2 space-y-2">
@@ -143,7 +142,7 @@ export default function AtualizarCacambaPage() {
                   <button type="button" className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 px-6 rounded-xl transition-all">
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2">
+                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2">
                     <Save className="w-5 h-5" />
                     Salvar Alterações
                   </button>
@@ -151,9 +150,7 @@ export default function AtualizarCacambaPage() {
               </form>
             </div>
 
-            {/* COLUNA DIREITA - Sem Scroll, Sem Estatísticas */}
             <div className="xl:col-span-1">
-              {/* Removido h-full e overflow para deixar o card do tamanho do conteúdo */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
                 
                 <h3 className="text-lg font-bold text-gray-900 mb-6">Foto da Caçamba</h3>
@@ -187,7 +184,7 @@ export default function AtualizarCacambaPage() {
                 <div className="space-y-4">
                   <label htmlFor="foto-upload-btn" className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 hover:border-blue-200 hover:text-blue-600 transition-all cursor-pointer">
                     <UploadCloud className="w-5 h-5" />
-                    <span className="font-semibold">Upload de nova foto</span>
+                    <span className="font-semibold">Upload nova foto</span>
                   </label>
                   <input id="foto-upload-btn" type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                   <p className="text-xs text-center text-gray-400">Recomendado: 800x600px, máx 2MB (JPG ou PNG)</p>
