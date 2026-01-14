@@ -87,7 +87,7 @@ export default function DeletarCacambaPage() {
                       height={200}
                       className="object-cover w-full h-full opacity-90 group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
+                    <div className="absolute top-4 right-4 bg-amber-400 text-black text-xs font-bold px-2 py-1 rounded shadow-sm">
                       {item.tamanho}m³
                     </div>
                   </div>
@@ -103,7 +103,7 @@ export default function DeletarCacambaPage() {
                           {item.status}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right">  
                         <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Diária</p>
                         <p className="font-bold text-blue-600">R$ {item.preco}</p>
                       </div>
