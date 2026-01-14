@@ -72,7 +72,7 @@ export default function DeletarCacambaPage() {
           
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Deletar Caçambas</h1>
-            <p className="text-lg text-gray-500">Gerencie a remoção de caçambas do inventário de Disk Entulho.</p>
+            <p className="text-lg text-gray-500">Gerencie a remoção de caçambas do inventário.</p>
           </header>
 
           {dumpsters.length > 0 ? (
