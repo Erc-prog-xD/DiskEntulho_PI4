@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { getCookie } from 'cookies-next'; 
 import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar";
 import { DashboardHeader } from "@/src/components/dashboard-header";
-import { Save, UploadCloud, Search, Edit3 } from "lucide-react"; 
+import { Save, UploadCloud, Search, Edit3, Loader2 } from "lucide-react"; 
 import Image from 'next/image';
 
 const MOCK_DB = [
@@ -13,13 +15,16 @@ const MOCK_DB = [
 ];
 
 export default function AtualizarCacambaPage() {
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState('1');
+  const [isLoading, setIsLoading] = useState(false); 
   
   const [formData, setFormData] = useState({
     nome: '',
     preco: '',
     tamanho: '5',
-    imagemPreview: null as string | null
+    imagemPreview: null as string | null,
+    imagemArquivo: null as File | null 
   });
 
   useEffect(() => {
@@ -29,7 +34,8 @@ export default function AtualizarCacambaPage() {
         nome: item.nome,
         preco: item.preco,
         tamanho: item.tamanho,
-        imagemPreview: item.imagem
+        imagemPreview: item.imagem,
+        imagemArquivo: null 
       });
     }
   }, [selectedId]);
@@ -43,7 +49,52 @@ export default function AtualizarCacambaPage() {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, imagemPreview: url }));
+      setFormData(prev => ({ 
+        ...prev, 
+        imagemPreview: url,
+        imagemArquivo: file 
+      }));
+    }
+  };
+
+  // FUNÇÃO DE INTEGRAÇÃO 
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const token = getCookie('token');
+
+      const data = new FormData();
+      data.append('id', selectedId); 
+      data.append('nome', formData.nome);
+      data.append('preco', formData.preco.replace(',', '.'));
+      data.append('tamanho', formData.tamanho);
+      
+      if (formData.imagemArquivo) {
+        data.append('imagem', formData.imagemArquivo);
+      }
+
+      const response = await fetch(`http://localhost:5000/api/cacambas/${selectedId}`, {
+        method: 'PUT', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: data
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar caçamba');
+      }
+
+      alert('Caçamba atualizada com sucesso!');
+      router.push('/admin/cacambas/lista'); 
+
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao salvar alterações.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,7 +141,7 @@ export default function AtualizarCacambaPage() {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 flex-1 min-h-0">
             
             <div className="xl:col-span-2 h-full min-h-0">
-              <form className="bg-white p-8 rounded-xl shadow-sm flex flex-col border border-gray-100 overflow-hidden">
+              <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-sm flex flex-col border border-gray-100 overflow-hidden">
                 
                 <div className="overflow-y-auto custom-scrollbar pr-2">
                   <div className="space-y-6">
@@ -139,12 +190,30 @@ export default function AtualizarCacambaPage() {
                 </div>
 
                 <div className="pt-6 mt-4 flex gap-4 border-t border-gray-100 flex-shrink-0">
-                  <button type="button" className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 px-6 rounded-xl transition-all">
+                  <button 
+                    type="button" 
+                    onClick={() => router.back()}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 px-6 rounded-xl transition-all"
+                  >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2">
-                    <Save className="w-5 h-5" />
-                    Salvar Alterações
+                  
+                  <button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-5 h-5" />
+                        Salvar Alterações
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
