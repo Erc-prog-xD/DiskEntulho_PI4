@@ -83,7 +83,7 @@ export default function AgendamentosPage() {
               </p>
 
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("./dashboard")}
                 className="h-12 px-8 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
               >
                 Agendar caçamba
