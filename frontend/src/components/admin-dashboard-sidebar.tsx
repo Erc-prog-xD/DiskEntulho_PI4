@@ -18,12 +18,6 @@ export function AdminDashboardSidebar() {
       active: true 
     },
     { 
-      icon: Calendar, 
-      label: "Agendamentos", 
-      href: "/admin/agendamentos",
-      active: false 
-    },
-    { 
       icon: Trash2, 
       label: "Caçambas", 
       active: false,
