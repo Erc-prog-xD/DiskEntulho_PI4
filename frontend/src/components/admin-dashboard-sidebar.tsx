@@ -1,7 +1,7 @@
 "use client" // Necessário pois agora usamos useState
 
 import { useState } from "react"
-import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig,  } from "lucide-react"
+import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 import Image from "next/image"
 import Link from "next/link" 
@@ -31,6 +31,7 @@ export function AdminDashboardSidebar() {
       isOpen: isCacambasOpen,
       toggle: () => setIsCacambasOpen(!isCacambasOpen),
       subItems: [
+        { label: "Listar Caçambas", href: "/admin/cacambas/listar", icon: ClipboardList },
         { label: "Cadastrar Caçamba", href: "/admin/cacambas/cadastrar", icon: Plus },
         { label: "Atualizar Caçamba", href: "/admin/cacambas/editar", icon: RefreshCw },
         { label: "Deletar Caçamba", href: "/admin/cacambas/deletar", icon: Trash },
