@@ -266,17 +266,17 @@ namespace Backend.Services.AdminService
                                             a.Pagamento.DeletionDate == null &&
                                             a.Pagamento.StatusPagamento == filtro.StatusPagamento.Value);
 
-                if (filtro.DataInicialFrom.HasValue)
-                    query = query.Where(a => a.DataInicial >= filtro.DataInicialFrom.Value);
+                if (filtro.DataInicialFrom.HasValue || filtro.DataFinalTo.HasValue)
+                {
+                    var start = (filtro.DataInicialFrom ?? DateTime.MinValue).Date;
 
-                if (filtro.DataInicialTo.HasValue)
-                    query = query.Where(a => a.DataInicial <= filtro.DataInicialTo.Value);
+                    var endExclusive = (filtro.DataFinalTo ?? DateTime.MaxValue).Date.AddDays(1);
 
-                if (filtro.DataFinalFrom.HasValue)
-                    query = query.Where(a => a.DataFinal >= filtro.DataFinalFrom.Value);
-
-                if (filtro.DataFinalTo.HasValue)
-                    query = query.Where(a => a.DataFinal <= filtro.DataFinalTo.Value);
+                    query = query.Where(a =>
+                        a.DataInicial < endExclusive &&
+                        a.DataFinal >= start
+                    );
+                }
 
                 // ordenação
                 query = (filtro.SortBy, filtro.SortDesc) switch

@@ -1,7 +1,7 @@
 "use client" // Necessário pois agora usamos useState
 
 import { useState } from "react"
-import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
+import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRound, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 import Image from "next/image"
 import Link from "next/link" 
@@ -46,8 +46,7 @@ export function AdminDashboardSidebar() {
       toggle: () => setIsActionsOpen(!isActionsOpen),
       subItems: [
         { label: "Confirmar agendamentos", href: "/admin/acoes/agendamentos-especie", icon: Banknote },
-        { label: "Deletar Cliente", href: "/admin/acoes/deletar-cliente", icon: UserRoundX },
-        { label: "Reativar Cliente", href: "/admin/acoes/reativar-cliente", icon: UserRoundCheck },
+        { label: "Gerenciar Cliente", href: "/admin/acoes/clientes", icon: UserRound },
         { label: "Listar Agendamentos", href: "/admin/acoes/agendamentos", icon: TextAlignStart },
       ]
     },

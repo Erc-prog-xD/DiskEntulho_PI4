@@ -14,9 +14,6 @@ namespace Backend.Dto
         public string? CacambaCodigo { get; set; }
 
         public DateTime? DataInicialFrom { get; set; }
-        public DateTime? DataInicialTo { get; set; }
-
-        public DateTime? DataFinalFrom { get; set; }
         public DateTime? DataFinalTo { get; set; }
 
         public bool? HasPagamento { get; set; }      // true = só com pagamento, false = só sem pagamento
