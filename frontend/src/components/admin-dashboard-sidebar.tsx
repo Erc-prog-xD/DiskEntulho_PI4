@@ -45,8 +45,7 @@ export function AdminDashboardSidebar() {
       isOpen: isActionsOpen,
       toggle: () => setIsActionsOpen(!isActionsOpen),
       subItems: [
-        { label: "Listar Agendamentos em Espécie", href: "/admin/acoes/agendamentos-especie", icon: Banknote },
-        { label: "Confirmar Agendamento", href: "/admin/acoes/confirmar-agendamentos", icon: Check },
+        { label: "Confirmar agendamentos", href: "/admin/acoes/agendamentos-especie", icon: Banknote },
         { label: "Deletar Cliente", href: "/admin/acoes/deletar-cliente", icon: UserRoundX },
         { label: "Reativar Cliente", href: "/admin/acoes/reativar-cliente", icon: UserRoundCheck },
         { label: "Listar Agendamentos", href: "/admin/acoes/agendamentos", icon: TextAlignStart },
