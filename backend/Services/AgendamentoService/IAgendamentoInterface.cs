@@ -7,6 +7,6 @@ namespace Backend.Services.AgendamentoService
     {
         Task<Response<Agendamento>> CadastrarAgendamento(int clientId, AgendamentoCreateDTO agendamento);
 
-        Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitos(int clientId);
+        Task<Response<List<AgendamentoResponseDTO>>> BuscarAgendamentosFeitosUsuarioLogado(int clientId);
     }
 }

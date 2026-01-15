@@ -6,8 +6,9 @@ using Backend.Dto;
 
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Client")]
     public class PagamentoController : ControllerBase
     {
         private readonly IPagamentoInterface _pagamentoService;
@@ -16,8 +17,7 @@ namespace Backend.Controllers
         {
             _pagamentoService = pagamentoService;
         }
-
-        [Authorize]
+        
         [HttpPost("AddPagamento")]
         public async Task<ActionResult> AdicionarPagamento(AddPagementoDTO pagamento)
         {

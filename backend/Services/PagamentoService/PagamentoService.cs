@@ -36,7 +36,7 @@ namespace Backend.Services.PagamentoService
                 {
                     return new Response<Agendamento>
                     {
-                        Mensage = "Agendamento não encontrado ou já possui pagamento",
+                        Mensagem = "Agendamento não encontrado ou já possui pagamento",
                         Status = false
                     };
                 }
@@ -46,7 +46,7 @@ namespace Backend.Services.PagamentoService
                 
                 if( agCacamba == null)
                 {
-                    response.Mensage = "Cacamba não encontrada";
+                    response.Mensagem = "Cacamba não encontrada";
                     response.Status = false;
                     response.Dados = null;
                     return response;
@@ -57,7 +57,7 @@ namespace Backend.Services.PagamentoService
 
                 if(preco == null)
                 {
-                    response.Mensage = "Preco não encontrado na tabela";
+                    response.Mensagem = "Preco não encontrado na tabela";
                     response.Status = false;
                     response.Dados = null;
                     return response;
@@ -77,9 +77,11 @@ namespace Backend.Services.PagamentoService
                     {
                         novoPagamento.StatusPagamento = Enum.PagamentoStatusEnum.Processando;
                     }
-                if (pagamento.TipoPagamento == Enum.PagamentoTypeEnum.Pix)
+                else if (novoPagamento.TipoPagamento == Enum.PagamentoTypeEnum.Pix)
                     {
-                        var(orderId, qrCodeLink)= await _pagBankService.CriarCobrancaPixAsync(agendamento.Client, valorTotal, $"Agendamento-{agendamento.Id}",agendamento.Cacamba);
+                        var(orderId, qrCodeLink)= await _pagBankService.CriarCobrancaPixAsync(
+                            agendamento.Client, valorTotal, $"Agendamento-{agendamento.Id}",agendamento.Cacamba
+                        );
                         novoPagamento.PagBankOrderId = orderId;
                         novoPagamento.PagBankQrCode = qrCodeLink;
                         novoPagamento.StatusPagamento = Enum.PagamentoStatusEnum.Criado;
@@ -106,7 +108,7 @@ namespace Backend.Services.PagamentoService
 
                 return new Response<Agendamento>
                 {
-                    Mensage = "Pagamento adicionado ao agendamento",
+                    Mensagem = "Pagamento adicionado ao agendamento",
                     Status = true,
                     Dados = agendamento
                 };
@@ -115,7 +117,7 @@ namespace Backend.Services.PagamentoService
             {
                 return new Response<Agendamento>
                 {
-                    Mensage = $"Erro ao adicionar pagamento: {ex.Message}",
+                    Mensagem = $"Erro ao adicionar pagamento: {ex.Message}",
                     Status = false
                 };
             }
