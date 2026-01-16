@@ -270,11 +270,12 @@ namespace Backend.Services.AdminService
                 {
                     var start = (filtro.DataInicialFrom ?? DateTime.MinValue).Date;
 
+                    // fim inclusivo (pega até 23:59:59 do dia)
                     var endExclusive = (filtro.DataFinalTo ?? DateTime.MaxValue).Date.AddDays(1);
 
                     query = query.Where(a =>
-                        a.DataInicial < endExclusive &&
-                        a.DataFinal >= start
+                        a.DataInicial >= start &&
+                        a.DataFinal < endExclusive
                     );
                 }
 
