@@ -87,6 +87,7 @@ export default function PagamentoAgendamentoClient() {
 
   const [qr, setQr] = useState<string | null>(null);
   const [pixGerado, setPixGerado] = useState(false);
+  const [EspecieConfirmado, setEspecieConfirmado] = useState(false);
 
   const [calculo, setCalculo] = useState<CalculoValorDTO | null>(null);
 
@@ -239,14 +240,18 @@ export default function PagamentoAgendamentoClient() {
         json.dados?.PagBankQrCode ??
         null;
 
+      if (tipo === 0) {
+        setEspecieConfirmado(true);
+        setMsg("Pagamento em espécie confirmado! Aguarde o Admin aprovar.");
+        return;
+      }
       if (tipo === 1 && pixQr) {
         setQr(pixQr);
         setPixGerado(true);
         setMsg("PIX gerado! Use o QR Code abaixo para pagar.");
         return;
       }
-
-      setMsg("Pagamento criado com sucesso!");
+      setMsg("Pagamento criado com sucesso! Aguarde o Admin aprovar.");
     } catch (e: any) {
       console.error(e);
       setMsg(e?.message || "Erro ao adicionar pagamento.");
@@ -340,7 +345,7 @@ export default function PagamentoAgendamentoClient() {
               </button>
 
               {/* Confirmar só existe quando NÃO veio pagamentoId e NÃO tem pix gerado */}
-              {!pagamentoIdRaw && !(tipo === 1 && pixGerado) && (
+              {!pagamentoIdRaw && !(tipo === 1 && pixGerado) && !(tipo === 0 && EspecieConfirmado) && (
                 <button
                   onClick={confirmar}
                   disabled={loading || loadingTopo}

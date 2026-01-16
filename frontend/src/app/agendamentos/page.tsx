@@ -210,7 +210,7 @@ export default function AgendamentosPage() {
                 const pagamentoId = getPagamentoId(pagamento);
 
                 const statusPagamento = pagamento?.statusPagamento ?? null;
-                const podePagar = statusPagamento !== 3; // != Aprovado
+
 
                 return (
                   <div key={agId || idx} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -255,7 +255,7 @@ export default function AgendamentosPage() {
                         </div>
                       )}
 
-                      {podePagar && agId > 0 && (
+                      {(statusPagamento ===  0 || statusPagamento == null) && agId > 0 && (
                         <button
                           onClick={() => {
                             // Se já existe pagamento, abre usando pagamentoId (melhor)
