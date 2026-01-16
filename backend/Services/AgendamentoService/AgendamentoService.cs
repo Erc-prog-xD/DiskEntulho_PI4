@@ -128,9 +128,12 @@ namespace Backend.Services.AgendamentoService
                     DataFinal = a.DataFinal,
                     Pagamento = a.Pagamento == null ? null : new Pagamento 
                     {
+                        Id = a.Pagamento.Id,
                         Valor = a.Pagamento.Valor,
                         TipoPagamento = a.Pagamento.TipoPagamento,
-                        StatusPagamento = a.Pagamento.StatusPagamento
+                        StatusPagamento = a.Pagamento.StatusPagamento,
+                        PagBankOrderId = a.Pagamento.PagBankOrderId,
+                        PagBankQrCode = a.Pagamento.PagBankQrCode
 
                     },
                     Endereco = new Endereco

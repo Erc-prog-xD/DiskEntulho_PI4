@@ -14,23 +14,24 @@ type ApiResponse<T> = {
 };
 
 type PagamentoApi = {
+  id?: number;
+  Id?: number;
+  pagamentoId?: number;
+  PagamentoId?: number;
+
   valor: number;
   tipoPagamento: number;   // 0..3
   statusPagamento: number; // 0..3
+
+  pagBankQrCode?: string | null;
+  PagBankQrCode?: string | null;
+  pagBankOrderId?: string | null;
+  PagBankOrderId?: string | null;
 };
 
 type AgendamentoApi = {
-  agendamentoId?: number; // seu dto
-  AgendamentoId?: number; // fallback se vier PascalCase
-
-  coord_X?: number | null;
-  Coord_X?: number | null;
-
-  coord_Y?: number | null;
-  Coord_Y?: number | null;
-
-  statusAgendamento?: string | number | null;
-  StatusAgendamento?: string | number | null;
+  agendamentoId?: number;
+  AgendamentoId?: number;
 
   dataInicial?: string;
   DataInicial?: string;
@@ -53,7 +54,7 @@ type AgendamentoApi = {
 
   cacamba?: {
     codigo: string;
-    tamanho: number; // 0..2
+    tamanho: number;
   };
   Cacamba?: any;
 };
@@ -75,6 +76,10 @@ function getCacamba(a: AgendamentoApi) {
 }
 function getPagamento(a: AgendamentoApi) {
   return a.pagamento ?? a.Pagamento ?? null;
+}
+function getPagamentoId(p: PagamentoApi | null) {
+  if (!p) return null;
+  return p.pagamentoId ?? p.PagamentoId ?? p.id ?? p.Id ?? null;
 }
 
 function tamanhoEnumParaM3(t: number) {
@@ -202,6 +207,7 @@ export default function AgendamentosPage() {
                 const endereco = getEndereco(a);
                 const cacamba = getCacamba(a);
                 const pagamento = getPagamento(a);
+                const pagamentoId = getPagamentoId(pagamento);
 
                 const statusPagamento = pagamento?.statusPagamento ?? null;
                 const podePagar = statusPagamento !== 3; // != Aprovado
@@ -251,7 +257,15 @@ export default function AgendamentosPage() {
 
                       {podePagar && agId > 0 && (
                         <button
-                          onClick={() => router.push(`/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`)}
+                          onClick={() => {
+                            // Se já existe pagamento, abre usando pagamentoId (melhor)
+                            if (pagamentoId) {
+                              router.push(`/agendamentos/pagamento?pagamentoId=${encodeURIComponent(String(pagamentoId))}`);
+                              return;
+                            }
+                            // Senão, abre pelo id do agendamento (vai calcular e permitir confirmar)
+                            router.push(`/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`);
+                          }}
                           className="h-10 px-5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
                         >
                           Pagar

@@ -7,5 +7,8 @@ namespace Backend.Services.PagamentoService
     {
         Task<Response<Agendamento>> AdicionarPagamento(AddPagementoDTO pagamento);
 
+        Task<Response<CalculoValorAgendamentoDTO>> CalcularValorAgendamento(int idAgendamento);
+        Task<Response<Pagamento?>> ObterPagamentoPorId(int idPagamento);
+
     }
 }
