@@ -3,11 +3,20 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import { jwtDecode } from 'jwt-decode';
+
 
 interface FormErrors {
   cpf?: string;
   password?: string;
 }
+
+type DotNetJwtPayload = {
+  Cpf?: string;
+  exp?: number;
+  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: "Admin" | "Client";
+};
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -108,9 +117,31 @@ export function LoginForm() {
       }
 
       const data = await response.json();
-      console.log("Login OK:", data);
 
-      localStorage.setItem("token", data.token);
+       if (!data.dados) {
+        alert("Login OK, mas o servidor não retornou token.");
+        return;
+      }
+      console.log("Login OK:", data);
+    
+      localStorage.setItem("token", data.dados);
+      document.cookie = `token=${data.dados}; path=/; samesite=lax`;
+
+      let payload: DotNetJwtPayload | null = null;
+      try {
+        payload = jwtDecode<DotNetJwtPayload>(data.dados);
+      } catch {
+        alert("Token inválido/inesperado.");
+        return;
+      }
+      const role =
+        payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      
+      if (role === "Admin") {
+         window.location.href = "/admin/dashboard";
+       } else {
+         window.location.href = "/usuario/dashboard";
+      }
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
@@ -186,7 +217,7 @@ export function LoginForm() {
               )}
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-4">
               <button
                 type="submit"
                 className="flex h-[65px] w-full items-center justify-center rounded-lg bg-[#0023C4] text-2xl font-semibold text-white transition-colors hover:bg-blue-800"
@@ -194,7 +225,15 @@ export function LoginForm() {
                 Login
               </button>
             </div>
-
+            <p className="mt-6 text-center text-lg text-black">
+              Não tem uma conta?{' '}
+              <Link
+                href="/auth/register"
+                className="font-semibold text-[#0023C4] hover:underline"
+              >
+                Cadastre-se
+              </Link>
+            </p>
           </form>
         </div>
       </div>
@@ -218,6 +257,7 @@ export function LoginForm() {
             priority
           />
         </div>
+
       </div>
     </div>
   );

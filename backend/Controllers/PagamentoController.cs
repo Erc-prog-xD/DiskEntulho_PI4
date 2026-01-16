@@ -25,12 +25,19 @@ namespace Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("AprovarPagamentoEspecie/{agendamentoId}")]
-        public async Task<ActionResult> AprovarPagamentoEspecie(int agendamentoId)
+        [HttpGet("CalcularValorAgendamento/{idAgendamento}")]
+        public async Task<ActionResult> CalcularValorAgendamento(int idAgendamento)
         {
-            var response = await _pagamentoService.AprovarPagamentoEspecie(agendamentoId);
+            var response = await _pagamentoService.CalcularValorAgendamento(idAgendamento);
             return Ok(response);
         }
+
+        [HttpGet("PagamentoPorId/{idPagamento:int}")]
+        public async Task<ActionResult> PagamentoPorId(int idPagamento)
+        {
+            var response = await _pagamentoService.ObterPagamentoPorId(idPagamento);
+            return Ok(response);
+        }
+
     }
 }

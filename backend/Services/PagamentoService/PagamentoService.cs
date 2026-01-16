@@ -124,75 +124,93 @@ namespace Backend.Services.PagamentoService
             }
         }
 
-        public async Task<Response<Agendamento>> AprovarPagamentoEspecie(int agendamentoId)
+        public async Task<Response<CalculoValorAgendamentoDTO>> CalcularValorAgendamento(int idAgendamento)
         {
-            var response = new Response<Agendamento>();
+            var response = new Response<CalculoValorAgendamentoDTO>();
+
             try
             {
-                // 1. Busca o agendamento junto com o pagamento e o cliente
                 var agendamento = await _context.Agendamento
-                    .Include(a => a.Pagamento)
-                    .Include(a => a.Client)
                     .Include(a => a.Cacamba)
-                    .FirstOrDefaultAsync(a => a.Id == agendamentoId && a.DeletionDate == null);
+                    .FirstOrDefaultAsync(a => a.Id == idAgendamento && a.DeletionDate == null);
 
-                // 2. Validações básicas
-                if (agendamento == null)
+                if (agendamento == null || agendamento.Cacamba == null)
                 {
-                    response.Mensagem = "Agendamento não encontrado.";
                     response.Status = false;
+                    response.Mensagem = "Agendamento não encontrado ou sem caçamba.";
+                    response.Dados = null;
                     return response;
                 }
 
-                if (agendamento.Pagamento == null)
+                var preco = await _context.Preco
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.Tamanho == agendamento.Cacamba.Tamanho);
+
+                if (preco == null)
                 {
-                    response.Mensagem = "Este agendamento não possui dados de pagamento vinculados.";
                     response.Status = false;
+                    response.Mensagem = "Preço não encontrado para o tamanho da caçamba.";
+                    response.Dados = null;
                     return response;
                 }
 
-                if (agendamento.Pagamento.TipoPagamento != PagamentoTypeEnum.Especie)
+                var dias = (agendamento.DataFinal.Date - agendamento.DataInicial.Date).Days;
+                if (dias <= 0) dias = 1; 
+
+                var valorTotal = preco.Valor * dias;
+
+                response.Status = true;
+                response.Mensagem = "Cálculo realizado com sucesso.";
+                response.Dados = new CalculoValorAgendamentoDTO
                 {
-                    response.Mensagem = "Erro: Este método aprova apenas pagamentos em Espécie.";
-                    response.Status = false;
-                    return response;
-                }
-
-                if (agendamento.Pagamento.StatusPagamento == PagamentoStatusEnum.Aprovado) 
-                {
-                    response.Mensagem = "Este pagamento já foi aprovado anteriormente.";
-                    response.Status = false;
-                    return response;
-                }
-
-                // 3. Atualiza os Status
-                agendamento.Pagamento.StatusPagamento = PagamentoStatusEnum.Aprovado;
-                agendamento.StatusAgendamento = AgendamentoStatus.Confirmado;
-                _context.Agendamento.Update(agendamento);
-                await _context.SaveChangesAsync();
-
-                await _notificationService.CriarNotificacaoAsync(
-                    agendamento.Id,
-                    agendamento.Client.Id,
-                    "Seu pagamento em dinheiro foi confirmado! O agendamento está aprovado.",
-                    AgendamentoStatus.Confirmado
-                );
-
-                return new Response<Agendamento>
-                {
-                    Mensagem = "Pagamento em espécie aprovado com sucesso!",
-                    Status = true,
-                    Dados = agendamento
+                    AgendamentoId = agendamento.Id,
+                    Dias = dias,
+                    ValorDiaria = preco.Valor,
+                    ValorTotal = valorTotal,
+                    Tamanho = agendamento.Cacamba.Tamanho
                 };
+
+                return response;
             }
             catch (Exception ex)
             {
-                return new Response<Agendamento>
-                {
-                    Mensagem = $"Erro ao aprovar pagamento: {ex.Message}",
-                    Status = false
-                };
+                response.Status = false;
+                response.Mensagem = "Erro ao calcular valor: " + ex.Message;
+                response.Dados = null;
+                return response;
             }
         }
+
+       public async Task<Response<Pagamento?>> ObterPagamentoPorId(int idPagamento)
+        {
+            var response = new Response<Pagamento?>();
+
+            try
+            {
+                var pagamento = await _context.Pagamento
+                    .FirstOrDefaultAsync(p => p.Id == idPagamento && p.DeletionDate == null);
+
+                if (pagamento == null)
+                {
+                    response.Status = false;
+                    response.Mensagem = "Pagamento não encontrado.";
+                    response.Dados = null;
+                    return response;
+                }
+
+                response.Status = true;
+                response.Mensagem = "Pagamento encontrado.";
+                response.Dados = pagamento;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Mensagem = "Erro ao buscar pagamento: " + ex.Message;
+                response.Dados = null;
+                return response;
+            }
+        }
+
     }
 }

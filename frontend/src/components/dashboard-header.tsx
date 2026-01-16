@@ -24,8 +24,8 @@ export function DashboardHeader() {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
           </button>
           <Avatar className="w-10 h-10">
-            <AvatarImage src="/woman-profile.png" alt="User" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src="/assets/woman-profile.png" alt="User" />
+            <AvatarFallback >U</AvatarFallback>
           </Avatar>
         </div>
       </div>

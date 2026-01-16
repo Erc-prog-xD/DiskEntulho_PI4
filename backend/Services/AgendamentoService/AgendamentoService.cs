@@ -113,18 +113,29 @@ namespace Backend.Services.AgendamentoService
                 var agendamentos = await _context.Agendamento
                     .Where(a => a.Client.Id == client.Id && a.DeletionDate == null)
                     .Include(a => a.Endereco)
+                    .Include(a => a.Pagamento)
                     .Include(a => a.Cacamba)
                     .ToListAsync();
 
                 // Converte para DTO
                 var agendamentosDto = agendamentos.Select(a => new AgendamentoResponseDTO
                 { 
+                    AgendamentoId = a.Id,
                     Coord_X = a.Coord_X,
                     Coord_Y = a.Coord_Y,
                     StatusAgendamento = a.StatusAgendamento,
                     DataInicial = a.DataInicial,
                     DataFinal = a.DataFinal,
+                    Pagamento = a.Pagamento == null ? null : new Pagamento 
+                    {
+                        Id = a.Pagamento.Id,
+                        Valor = a.Pagamento.Valor,
+                        TipoPagamento = a.Pagamento.TipoPagamento,
+                        StatusPagamento = a.Pagamento.StatusPagamento,
+                        PagBankOrderId = a.Pagamento.PagBankOrderId,
+                        PagBankQrCode = a.Pagamento.PagBankQrCode
 
+                    },
                     Endereco = new Endereco
                     {
                         Rua = a.Endereco.Rua,
