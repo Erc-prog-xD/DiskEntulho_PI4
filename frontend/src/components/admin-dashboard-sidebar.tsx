@@ -1,7 +1,7 @@
 "use client" // Necessário pois agora usamos useState
 
 import { useState } from "react"
-import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRound, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
+import { Home, User, Trash2, ChevronDown,LogOut, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRound, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 import Image from "next/image"
 import Link from "next/link" 
@@ -49,15 +49,19 @@ export function AdminDashboardSidebar() {
       label: "Perfil", 
       href: "/admin/perfil",
       active: false 
-    },
-    { 
-      icon: Settings, 
-      label: "Configurações", 
-      href: "/admin/configuracoes",
-      active: false 
-    },
+    }
   ]
 
+  function handleLogout() {
+    // remove token do localStorage
+    localStorage.removeItem("token");
+
+    // remove cookie do token
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    // redireciona para login
+    window.location.href = "/auth/login";
+  }
   return (
     <aside className="w-80 bg-white border-r border-gray-200 flex flex-col min-h-screen">
       <div className="ml-8 p-8 pb-6">
@@ -134,6 +138,14 @@ export function AdminDashboardSidebar() {
             </Link>
           )
         })}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-4 px-5 py-4 rounded-lg mb-2
+                    text-red-600 hover:bg-red-50 transition-all"
+        >
+          <LogOut className="w-6 h-6" />
+          <span className="text-base font-medium">Sair</span>
+        </button>
       </nav>
     </aside>
   )

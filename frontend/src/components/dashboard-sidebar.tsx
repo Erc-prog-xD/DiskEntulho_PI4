@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Home, Calendar, User, Settings, ChevronDown } from "lucide-react";
+import { Home, Calendar, User, ChevronDown, LogOut } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 
 type ChildItem = { label: string; href: string; exact?: boolean };
@@ -38,8 +38,18 @@ export function DashboardSidebar() {
     },
 
     { icon: User, label: "Perfil", href: "/usuario/perfil" },
-    { icon: Settings, label: "Configurações", href: "/usuario/configuracoes" },
   ]), []);
+
+  function handleLogout() {
+  // remove token do localStorage
+  localStorage.removeItem("token");
+
+  // remove cookie do token
+  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+  // redireciona para login
+  window.location.href = "/auth/login";
+}
 
   return (
     <aside className="w-80 bg-white border-r border-gray-200 flex flex-col">
@@ -96,8 +106,9 @@ export function DashboardSidebar() {
                   <span className="text-base font-medium">{item.label}</span>
                 </div>
                 <ChevronDown className={cn("w-5 h-5 transition-transform", openAgendamentos ? "rotate-180" : "")} />
+                
               </button>
-
+             
               {openAgendamentos && (
                 <div className="ml-6 mb-2">
                   {item.children.map((child) => {
@@ -123,8 +134,17 @@ export function DashboardSidebar() {
                 </div>
               )}
             </div>
+            
           );
         })}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-4 px-5 py-4 rounded-lg
+                    text-red-600 hover:bg-red-50 transition-all"
+        >
+          <LogOut className="w-6 h-6" />
+          <span className="text-base font-medium">Sair</span>
+        </button>
       </nav>
     </aside>
   );
