@@ -1,7 +1,6 @@
-using backend.Models;
+using Backend.Models;
 using Backend.Data;
 using Backend.Dto;
-using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

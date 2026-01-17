@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ./Backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: diskentulho_api
     ports:

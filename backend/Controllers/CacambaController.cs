@@ -11,7 +11,7 @@ namespace Backend.Controllers
     {
         private readonly ICacambaInterface _cacambaInterface;
 
-        public CacambaController(CacambaService cacambaInterface)
+        public CacambaController(ICacambaInterface cacambaInterface)
         {
             _cacambaInterface = cacambaInterface;
         }

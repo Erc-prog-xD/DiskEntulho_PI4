@@ -6,7 +6,7 @@ namespace Backend.Dto
     public class AddPagementoDTO
     {
 
-        public required int idAgendamento { get; set; }
+        public required int IdAgendamento { get; set; }
         [Required(ErrorMessage = "O campo Valor é obrigatório.")]
 
         [EnumDataType(typeof(PagamentoTypeEnum), ErrorMessage = "Tipo de pagamento inválido.")]

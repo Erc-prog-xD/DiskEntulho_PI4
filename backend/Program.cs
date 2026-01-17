@@ -101,7 +101,7 @@ builder.Services.AddScoped<IAgendamentoInterface, AgendamentoService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAdminInterface, AdminService>();
 builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
-builder.Services.AddScoped<CacambaService>();
+builder.Services.AddScoped<ICacambaInterface, CacambaService>();
 
 // Background services
 builder.Services.AddHostedService<AgendamentoExpirationService>();
@@ -122,13 +122,20 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
+        var originsRaw = builder.Configuration["FRONTEND_ORIGINS"] ?? "http://localhost:3000";
+        var origins = originsRaw
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .WithOrigins("http://localhost:3000");
+            .WithOrigins(origins);
+
+        // Só use se você fizer requests com credentials (cookies/Authorization cross-site).
+        // Se não usa, deixe comentado.
+        // policy.AllowCredentials();
     });
 });
-
 
 // -----------------------------------------------------------------------------
 // Banco de dados
@@ -167,14 +174,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var tokenKey = builder.Configuration["AppSettings:Token"];
-        
-        // Verificação de segurança para Debug
-        if (string.IsNullOrEmpty(tokenKey) || tokenKey.Length < 16)
+      var tokenKey = builder.Configuration["AppSettings:Token"];
+        if (string.IsNullOrWhiteSpace(tokenKey) || tokenKey.Length < 16)
         {
-             Console.WriteLine($"[AUTH ALERT] Token JWT inválido ou não carregado! Valor: '{tokenKey}'");
-             // Fallback apenas para não crashar a inicialização, mas o login falhará
-             tokenKey = "chave_fallback_temporaria_para_debug_apenas_123456"; 
+            if (!builder.Environment.IsDevelopment())
+                throw new InvalidOperationException("AppSettings:Token ausente ou inválido.");
+
+            Console.WriteLine($"[AUTH ALERT] Token JWT inválido: '{tokenKey}'");
+            tokenKey = "chave_fallback_temporaria_para_debug_apenas_123456";
         }
 
         options.TokenValidationParameters = new TokenValidationParameters
