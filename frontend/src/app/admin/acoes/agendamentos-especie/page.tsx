@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { getCookie } from "cookies-next";
 
-// ---------------- TIPAGENS (wrapper do backend) ----------------
 type ApiResponse<T> = {
   status: boolean;
   mensagem: string;
@@ -44,7 +43,7 @@ type CacambaDTO = {
 
 type Pagamento = {
   valor?: number;
-  Valor?: number; // fallback caso venha PascalCase
+  Valor?: number; 
 };
 
 type AgendamentoAdminDTO = {
@@ -55,16 +54,14 @@ type AgendamentoAdminDTO = {
   clientCpf: string;
   clientName: string;
   pagamento: Pagamento;
-  statusAgendamento?: number; // 0..4
-  dataInicial: string; // ISO
-  dataFinal: string;   // ISO
+  statusAgendamento?: number; 
+  dataInicial: string; 
+  dataFinal: string;   
 };
 
 type StatusLabel = 'Criado' | 'Processando' | 'Rejeitado' | 'Confirmado' | 'Finalizado';
 
-// ---------------- HELPERS ----------------
 function statusEnumToLabel(status?: number): StatusLabel {
-  // 0 Criado, 1 Processando, 2 Rejeitado, 3 Confirmado, 4 Finalizado
   switch (status) {
     case 0: return 'Criado';
     case 1: return 'Processando';
@@ -106,7 +103,6 @@ function iniciaisNome(nome?: string) {
   return ini || 'CL';
 }
 
-// ---------------- UI: BADGE DE STATUS ----------------
 const StatusBadge = ({ status }: { status: StatusLabel }) => {
   const statusConfig: Record<StatusLabel, { style: string; icon: any; spin?: boolean }> = {
     Criado: { style: 'bg-blue-50 text-blue-700 border border-blue-100', icon: Clock },
@@ -139,10 +135,8 @@ export default function AgendamentosEspeciePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // loading de ação por linha (confirmar/rejeitar)
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
-  // modal de confirmação para rejeitar
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<number | null>(null);
 
@@ -199,15 +193,12 @@ export default function AgendamentosEspeciePage() {
 
   useEffect(() => {
     fetchAgendamentos(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchAgendamentos(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // ✅ FUNÇÃO ÚNICA: confirma (true) ou rejeita (false) no MESMO endpoint
   const decidirAgendamento = async (idAgendamento: number, aprovar: boolean) => {
     try {
       setActionLoadingId(idAgendamento);
@@ -219,8 +210,6 @@ export default function AgendamentosEspeciePage() {
         return;
       }
 
-      // Como o controller recebe (int idAgendamento, bool ConfirmarAgendamento),
-      // o jeito mais simples é mandar o bool via query string:
       const url = `${API_BASE}/api/Admin/ConfirmarAgendamento/${idAgendamento}?ConfirmarAgendamento=${aprovar}`;
 
       const res = await fetch(url, {
@@ -237,12 +226,11 @@ export default function AgendamentosEspeciePage() {
         throw new Error(msg);
       }
 
-      // fecha modal se era rejeição
       setIsRejectModalOpen(false);
       setRejectTargetId(null);
 
       alert(aprovar ? 'Agendamento confirmado!' : 'Agendamento rejeitado!');
-      fetchAgendamentos(page); // reload da lista sem F5
+      fetchAgendamentos(page); 
     } catch (e: any) {
       console.error(e);
       alert(e?.message || 'Erro ao executar ação.');
@@ -257,7 +245,7 @@ export default function AgendamentosEspeciePage() {
   };
 
   const fecharModalRejeitar = () => {
-    if (actionLoadingId) return; // evita fechar no meio
+    if (actionLoadingId) return;
     setIsRejectModalOpen(false);
     setRejectTargetId(null);
   };

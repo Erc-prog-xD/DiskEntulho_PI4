@@ -36,8 +36,8 @@ export default function GerenciarClientePage() {
 
       const url =
         mode === 'deletar'
-          ? `${API_BASE}/api/Admin/DeletarCliente/${id}` // :contentReference[oaicite:15]{index=15}
-          : `${API_BASE}/api/Admin/ReativarCliente/${id}`; // :contentReference[oaicite:16]{index=16}
+          ? `${API_BASE}/api/Admin/DeletarCliente/${id}` 
+          : `${API_BASE}/api/Admin/ReativarCliente/${id}`; 
 
       const method = mode === 'deletar' ? 'DELETE' : 'POST';
 

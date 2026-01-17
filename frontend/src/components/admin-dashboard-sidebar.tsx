@@ -1,12 +1,16 @@
-"use client" // Necessário pois agora usamos useState
+"use client" 
 
 import { useState } from "react"
-import { Home, Calendar, User, Settings, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRound, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
+import { useAuth } from "@/src/hooks/useAuth"
+import { Home, User, Trash2, ChevronDown, ChevronRight, Plus, RefreshCw, Trash, Banknote, UserRound, TextAlignStart, ChartColumnBig, ClipboardList, LogOut   } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 import Image from "next/image"
 import Link from "next/link" 
+import { on } from "events"
 
 export function AdminDashboardSidebar() {
+  const { logout } = useAuth()
+
   const [isCacambasOpen, setIsCacambasOpen, ] = useState(false)
   const [isActionsOpen, setIsActionsOpen] = useState(false)
 
@@ -51,10 +55,11 @@ export function AdminDashboardSidebar() {
       active: false 
     },
     { 
-      icon: Settings, 
-      label: "Configurações", 
-      href: "/admin/configuracoes",
-      active: false 
+      icon: LogOut, 
+      label: "Logout", 
+      href: "#",
+      active: false,
+      isLogout: true 
     },
   ]
 
@@ -115,6 +120,21 @@ export function AdminDashboardSidebar() {
                   </div>
                 )}
               </div>
+            )
+          }
+
+          if (item.isLogout) {
+            return (
+              <button
+                key={index}
+                onAbort={logout}
+                className={cn(
+                  "w-full flex items-center gap-4 px-5 py-4 rounded-lg mb-2 transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                )}
+              >
+                <Icon className="w-6 h-6" />
+                <span className="text-base font-medium">{item.label}</span>
+              </button>
             )
           }
 
