@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { jwtDecode } from 'jwt-decode';
-
+import { API_BASE } from "@/src/lib/api";
+import { setAuthToken } from "@/src/lib/auth";
 
 interface FormErrors {
   cpf?: string;
@@ -92,62 +93,57 @@ export function LoginForm() {
   };
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    const apiUrl = "http://localhost:8080";
-    const cleanCpf = cpf.replace(/\D/g, ''); 
+  const cleanCpf = cpf.replace(/\D/g, "");
 
-    try {
-      const response = await fetch(`${apiUrl}/api/Auth/Login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cpf: cleanCpf, 
-          password: password,
-        }),
-      });
+  try {
+    const response = await fetch(`${API_BASE}/api/Auth/Login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cpf: cleanCpf, password }),
+    });
 
-      if (!response.ok) {
-        alert("Usuário ou senha incorretos"); 
-        return;
-      }
-
-      const data = await response.json();
-
-       if (!data.dados) {
-        alert("Login OK, mas o servidor não retornou token.");
-        return;
-      }
-      console.log("Login OK:", data);
-    
-      localStorage.setItem("token", data.dados);
-      document.cookie = `token=${data.dados}; path=/; samesite=lax`;
-
-      let payload: DotNetJwtPayload | null = null;
-      try {
-        payload = jwtDecode<DotNetJwtPayload>(data.dados);
-      } catch {
-        alert("Token inválido/inesperado.");
-        return;
-      }
-      const role =
-        payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-      
-      if (role === "Admin") {
-         window.location.href = "/admin/dashboard";
-       } else {
-         window.location.href = "/usuario/dashboard";
-      }
-
-    } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      alert("Erro ao conectar com o servidor.");
+    if (!response.ok) {
+      alert("Usuário ou senha incorretos");
+      return;
     }
+
+    const data = await response.json();
+
+    if (!data.dados) {
+      alert("Login OK, mas o servidor não retornou token.");
+      return;
+    }
+
+    const token = String(data.dados);
+
+    // manter localStorage é opcional; hoje você salva :contentReference[oaicite:13]{index=13}
+    localStorage.setItem("token", token);
+
+    // pega exp do token e seta cookie com maxAge correto
+    let payload: DotNetJwtPayload | null = null;
+    try {
+      payload = jwtDecode<DotNetJwtPayload>(token);
+    } catch {
+      alert("Token inválido/inesperado.");
+      return;
+    }
+
+    setAuthToken(token, payload?.exp);
+
+    const role =
+      payload?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+    window.location.href =
+      role === "Admin" ? "/admin/dashboard" : "/usuario/dashboard";
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    alert("Erro ao conectar com o servidor.");
   }
+}
 
   return (
     <div className="flex min-h-screen w-full bg-white font-sans">

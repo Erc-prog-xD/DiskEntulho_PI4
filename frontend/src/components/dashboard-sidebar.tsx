@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Home, Calendar, User, ChevronDown, LogOut } from "lucide-react";
+import { Home, Calendar, User, LogOut, ChevronDown } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 
 type ChildItem = { label: string; href: string; exact?: boolean };
@@ -37,7 +37,7 @@ export function DashboardSidebar() {
       ],
     },
 
-    { icon: User, label: "Perfil", href: "/usuario/perfil" },
+    { icon: User, label: "Perfil", href: "/perfil" },
   ]), []);
 
   function handleLogout() {

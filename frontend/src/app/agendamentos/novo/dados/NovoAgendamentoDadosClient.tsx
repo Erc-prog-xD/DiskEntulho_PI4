@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCookie } from "cookies-next";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { DashboardSidebar } from "@/src/components/dashboard-sidebar";
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -33,7 +33,6 @@ type AgendamentoCreatePayload = {
 export default function NovoAgendamentoDadosClient() {
   const router = useRouter();
   const sp = useSearchParams();
-  const API_BASE = useMemo(() => "http://localhost:8080", []);
 
   const cacambaIdRaw = sp.get("cacambaId") ?? "";
   const inicio = sp.get("inicio") ?? "";
@@ -80,10 +79,6 @@ export default function NovoAgendamentoDadosClient() {
 
     setIsLoading(true);
     try {
-      const raw = getCookie("token");
-      const token = String(raw ?? "").replace(/^Bearer\s+/i, "").trim();
-      if (!token) throw new Error("Token não encontrado. Faça login novamente.");
-
       const payload: AgendamentoCreatePayload = {
         cacambaId,
         dataInicial: new Date(inicio).toISOString(),
@@ -100,26 +95,15 @@ export default function NovoAgendamentoDadosClient() {
         },
       };
 
-      const res = await fetch(`${API_BASE}/api/Agendamento/CadastrarAgendamento`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const json = await apiFetch<ApiResponse<any>>(
+        "/api/Agendamento/CadastrarAgendamento",
+        { method: "POST", body: JSON.stringify(payload) }
+      );
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.mensagem || body?.message || `Erro HTTP ${res.status}`);
-      }
-
-      const json: ApiResponse<any> = await res.json();
       if (!json.status) throw new Error(json.mensagem || "Falha ao criar agendamento.");
 
       alert("Agendamento criado com sucesso!");
 
-      // vai direto pro pagamento (id pode vir como id ou Id)
       const agId = json.dados?.id ?? json.dados?.Id ?? null;
 
       if (agId) {

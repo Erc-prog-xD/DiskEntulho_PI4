@@ -1,7 +1,7 @@
 "use client" // Necessário pois agora usamos useState
 
 import { useState } from "react"
-import { Home, User, Trash2, ChevronDown,LogOut, ChevronRight, Plus, RefreshCw, Trash, Banknote, Check, UserRound, UserRoundX, UserRoundCheck, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
+import { Home, User, Trash2, ChevronDown,LogOut, ChevronRight, Plus, RefreshCw, Trash, Banknote, UserRound, TextAlignStart, ChartColumnBig, ClipboardList   } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 import Image from "next/image"
 import Link from "next/link" 
@@ -47,7 +47,7 @@ export function AdminDashboardSidebar() {
     { 
       icon: User, 
       label: "Perfil", 
-      href: "/admin/perfil",
+      href: "/perfil",
       active: false 
     }
   ]

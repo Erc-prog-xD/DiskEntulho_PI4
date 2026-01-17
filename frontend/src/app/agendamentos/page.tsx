@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCookie } from "cookies-next";
 import Image from "next/image";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { DashboardSidebar } from "@/src/components/dashboard-sidebar";
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -121,7 +121,6 @@ function pagamentoStatusBadgeClass(s?: number | null) {
 
 export default function AgendamentosPage() {
   const router = useRouter();
-  const API_BASE = "http://localhost:8080";
 
   const [items, setItems] = useState<AgendamentoApi[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,23 +131,12 @@ export default function AgendamentosPage() {
     setError(null);
 
     try {
-      const token = getCookie("token");
-      if (!token) throw new Error("Você não está autenticado. Faça login novamente.");
+      const json = await apiFetch<ApiResponse<AgendamentoApi[]>>(
+        "/api/Agendamento/AgendamentosFeitosUsuarioLogado",
+        { method: "GET", cache: "no-store" }
+      );
 
-      const res = await fetch(`${API_BASE}/api/Agendamento/AgendamentosFeitosUsuarioLogado`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.mensagem || body?.message || `Erro HTTP ${res.status}`);
-      }
-
-      const json: ApiResponse<AgendamentoApi[]> = await res.json();
       if (!json.status) throw new Error(json.mensagem || "Falha ao buscar agendamentos.");
-
       setItems(json.dados ?? []);
     } catch (e: any) {
       console.error(e);
@@ -211,7 +199,6 @@ export default function AgendamentosPage() {
 
                 const statusPagamento = pagamento?.statusPagamento ?? null;
 
-
                 return (
                   <div key={agId || idx} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <div className="flex items-start justify-between gap-4">
@@ -255,15 +242,13 @@ export default function AgendamentosPage() {
                         </div>
                       )}
 
-                      {(statusPagamento ===  0 || statusPagamento == null) && agId > 0 && (
+                      {(statusPagamento === 0 || statusPagamento == null) && agId > 0 && (
                         <button
                           onClick={() => {
-                            // Se já existe pagamento, abre usando pagamentoId (melhor)
                             if (pagamentoId) {
                               router.push(`/agendamentos/pagamento?pagamentoId=${encodeURIComponent(String(pagamentoId))}`);
                               return;
                             }
-                            // Senão, abre pelo id do agendamento (vai calcular e permitir confirmar)
                             router.push(`/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`);
                           }}
                           className="h-10 px-5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"

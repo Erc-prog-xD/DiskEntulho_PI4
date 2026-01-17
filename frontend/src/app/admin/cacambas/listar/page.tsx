@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCookie } from 'cookies-next';
 import Image from 'next/image';
 import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { Loader2, PackageSearch } from "lucide-react";
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -35,8 +35,6 @@ function statusParaTexto(status: number): { label: string; className: string } {
 }
 
 export default function ListarCacambasPage() {
-  const API_BASE = 'http://localhost:8080';
-
   const [cacambas, setCacambas] = useState<CacambaApi[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,28 +44,11 @@ export default function ListarCacambasPage() {
     setError(null);
 
     try {
-      const token = getCookie('token');
-      if (!token) {
-        setError('Você não está autenticado. Faça login novamente.');
-        setCacambas([]);
-        return;
-      }
+      const json = await apiFetch<ApiResponse<CacambaApi[]>>(
+        '/api/Cacamba/ListarTodasCacambas',
+        { method: 'GET' }
+      );
 
-      const res = await fetch(`${API_BASE}/api/Cacamba/ListarTodasCacambas`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-        cache: 'no-store',
-      });
-
-      if (!res.ok) {
-        let msg = `Erro ao listar caçambas (HTTP ${res.status})`;
-        const body = await res.json().catch(() => null);
-        if (body?.mensagem) msg = body.mensagem;
-        if (body?.message) msg = body.message;
-        throw new Error(msg);
-      }
-
-      const json: ApiResponse<CacambaApi[]> = await res.json();
       setCacambas(json.dados ?? []);
     } catch (e: any) {
       console.error(e);

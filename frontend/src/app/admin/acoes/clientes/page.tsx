@@ -1,14 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { getCookie } from 'cookies-next';
 import { AdminDashboardSidebar } from '@/src/components/admin-dashboard-sidebar';
 import { DashboardHeader } from '@/src/components/dashboard-header';
 import { Loader2, UserRoundX, UserRoundCheck, AlertTriangle } from 'lucide-react';
-
-const API_BASE = 'http://localhost:8080';
+import { apiFetch } from '@/src/lib/api';
 
 type ActionMode = 'deletar' | 'reativar';
+
+type ApiResponse<T> = {
+  status: boolean;
+  mensagem?: string;
+  dados?: T | null;
+};
 
 export default function GerenciarClientePage() {
   const [clientId, setClientId] = useState('');
@@ -31,28 +35,34 @@ export default function GerenciarClientePage() {
 
     setIsLoading(true);
     try {
-      const token = getCookie('token');
-      if (!token) throw new Error('Token não encontrado. Faça login novamente.');
-
-      const url =
+      const path =
         mode === 'deletar'
-          ? `${API_BASE}/api/Admin/DeletarCliente/${id}` // :contentReference[oaicite:15]{index=15}
-          : `${API_BASE}/api/Admin/ReativarCliente/${id}`; // :contentReference[oaicite:16]{index=16}
+          ? `/api/Admin/DeletarCliente/${id}`
+          : `/api/Admin/ReativarCliente/${id}`;
 
       const method = mode === 'deletar' ? 'DELETE' : 'POST';
 
-      const res = await fetch(url, {
-        method,
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const json = await apiFetch<ApiResponse<any>>(
+        path,
+        { method }
+        // auth padrão = true (apiFetch já injeta Bearer pelo cookie token)
+      );
 
-      const body = await res.json().catch(() => null);
+      // Se sua API sempre retorna {status,mensagem,...}
+      if (json && typeof json === 'object' && 'status' in json) {
+        if (!(json as any).status) {
+          throw new Error((json as any).mensagem || 'Falha ao executar ação.');
+        }
 
-      if (!res.ok) {
-        throw new Error(body?.mensagem || body?.message || `Erro HTTP ${res.status}`);
+        alert(
+          (json as any).mensagem ||
+            (mode === 'deletar' ? 'Cliente deletado!' : 'Cliente reativado!')
+        );
+      } else {
+        // Se algum endpoint retornar body diferente, ainda assim considera sucesso
+        alert(mode === 'deletar' ? 'Cliente deletado!' : 'Cliente reativado!');
       }
 
-      alert(body?.mensagem || (mode === 'deletar' ? 'Cliente deletado!' : 'Cliente reativado!'));
       setClientId('');
     } catch (e: any) {
       console.error(e);

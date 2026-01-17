@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCookie } from "cookies-next";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { DashboardSidebar } from "@/src/components/dashboard-sidebar";
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -70,7 +70,6 @@ function getValor(p: PagamentoDTO | null) {
 export default function PagamentoAgendamentoClient() {
   const router = useRouter();
   const sp = useSearchParams();
-  const API_BASE = useMemo(() => "http://localhost:8080", []);
 
   const idAgendamentoRaw = sp.get("id") ?? "";
   const idAgendamento = Number(idAgendamentoRaw);
@@ -96,11 +95,6 @@ export default function PagamentoAgendamentoClient() {
 
   const voltar = () => router.push("/agendamentos");
 
-  function getAuthToken(): string {
-    const raw = getCookie("token");
-    return String(raw ?? "").replace(/^Bearer\s+/i, "").trim();
-  }
-
   useEffect(() => {
     const run = async () => {
       setMsg(null);
@@ -109,29 +103,18 @@ export default function PagamentoAgendamentoClient() {
       setCalculo(null);
       setPagamentoExistente(null);
 
-      const token = getAuthToken();
-      if (!token) {
-        setMsg("Token não encontrado. Faça login novamente.");
-        return;
-      }
-
       setLoadingTopo(true);
       try {
         // 1) Se veio pagamentoId -> busca pagamento diretamente
         if (pagamentoIdRaw && !Number.isNaN(pagamentoId) && pagamentoId > 0) {
-          const res = await fetch(`${API_BASE}/api/Pagamento/PagamentoPorId/${pagamentoId}`, {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-            cache: "no-store",
-          });
+          const json = await apiFetch<ApiResponse<PagamentoDTO>>(
+            `/api/Pagamento/PagamentoPorId/${pagamentoId}`,
+            { method: "GET" }
+          );
 
-          if (!res.ok) {
-            const b = await res.json().catch(() => null);
-            throw new Error(b?.mensagem || b?.message || `Erro HTTP ${res.status}`);
+          if (!json.status || !json.dados) {
+            throw new Error(json.mensagem || "Pagamento não encontrado.");
           }
-
-          const json: ApiResponse<PagamentoDTO> = await res.json();
-          if (!json.status || !json.dados) throw new Error(json.mensagem || "Pagamento não encontrado.");
 
           setPagamentoExistente(json.dados);
 
@@ -161,21 +144,11 @@ export default function PagamentoAgendamentoClient() {
           return;
         }
 
-        const resCalc = await fetch(
-          `${API_BASE}/api/Pagamento/CalcularValorAgendamento/${idAgendamento}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-            cache: "no-store",
-          }
+        const jsonCalc = await apiFetch<ApiResponse<CalculoValorDTO>>(
+          `/api/Pagamento/CalcularValorAgendamento/${idAgendamento}`,
+          { method: "GET" }
         );
 
-        if (!resCalc.ok) {
-          const b = await resCalc.json().catch(() => null);
-          throw new Error(b?.mensagem || b?.message || `Erro HTTP ${resCalc.status}`);
-        }
-
-        const jsonCalc: ApiResponse<CalculoValorDTO> = await resCalc.json();
         if (!jsonCalc.status || !jsonCalc.dados) {
           throw new Error(jsonCalc.mensagem || "Falha ao calcular valor.");
         }
@@ -190,18 +163,12 @@ export default function PagamentoAgendamentoClient() {
     };
 
     run();
-  }, [API_BASE, pagamentoIdRaw, pagamentoId, idAgendamentoRaw, idAgendamento]);
+  }, [pagamentoIdRaw, pagamentoId, idAgendamentoRaw, idAgendamento]);
 
   // POST - criar pagamento (só quando NÃO existe pagamentoId e NÃO tem pix pendente)
   const confirmar = async () => {
     setMsg(null);
     setQr(null);
-
-    const token = getAuthToken();
-    if (!token) {
-      setMsg("Token não encontrado. Faça login novamente.");
-      return;
-    }
 
     if (!idAgendamentoRaw || Number.isNaN(idAgendamento) || idAgendamento <= 0) {
       setMsg("Agendamento inválido. Volte para a listagem.");
@@ -215,21 +182,14 @@ export default function PagamentoAgendamentoClient() {
         TipoPagamento: tipo,
       };
 
-      const res = await fetch(`${API_BASE}/api/Pagamento/AddPagamento`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const json = await apiFetch<ApiResponse<any>>(
+        "/api/Pagamento/AddPagamento",
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        }
+      );
 
-      if (!res.ok) {
-        const b = await res.json().catch(() => null);
-        throw new Error(b?.mensagem || b?.message || `Erro HTTP ${res.status}`);
-      }
-
-      const json: ApiResponse<any> = await res.json();
       if (!json.status) throw new Error(json.mensagem || "Falha ao adicionar pagamento.");
 
       const pixQr =
