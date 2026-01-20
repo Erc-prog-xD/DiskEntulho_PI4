@@ -60,6 +60,30 @@ O projeto está totalmente containerizado. Para rodar, basta executar:
    3.4 Acesse a aplicação:
    - Swagger (API): http://localhost:8080/swagger
 
+## 📂 Estrutura do Projeto
+
+O projeto está organizado em dois diretórios principais, separando as responsabilidades de interface e regra de negócio:
+
+```plaintext
+DiskEntulho_PI4/
+├── 📂 backend/             # API em .NET 9
+│   ├── 📂 Controllers/     # Endpoints da API (Admin, Auth, Cacamba, etc.)
+│   ├── 📂 DTO/             # Objetos de Transferência de Dados
+│   ├── 📂 Models/          # Entidades do Banco de Dados (Entity Framework)
+│   ├── 📂 Services/        # Regras de Negócio
+│   └── 📄 Dockerfile       # Configuração da imagem do Backend
+│
+├── 📂 frontend/            # Aplicação Web em Next.js (React)
+│   ├── 📂 src/
+│   │   ├── 📂 app/         # Páginas e Rotas (Next.js App Router)
+│   │   ├── 📂 components/  # Componentes reutilizáveis (UI)
+│   │   └── 📂 services/    # Integração com a API (Axios/Fetch)
+│   └── 📄 Dockerfile       # Configuração da imagem do Frontend
+│
+├── 📄 docker-compose.yml   # Orquestração dos containers (App, API, Banco)
+└── 📄 README.md            # Documentação do Projeto
+```
+
 ## 🔐 Autenticação e Segurança
 
 A segurança do sistema é gerenciada via **JWT (JSON Web Token)**. O controle de acesso é baseado em *Roles* (perfis), garantindo que apenas usuários autorizados acessem endpoints sensíveis.
