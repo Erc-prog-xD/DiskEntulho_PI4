@@ -2,11 +2,11 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCookie } from 'cookies-next';
 import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { Save, UploadCloud, Search, Edit3, Loader2 } from "lucide-react";
 import Image from 'next/image';
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -29,7 +29,6 @@ type CacambaUpdatePayload = {
 
 export default function AtualizarCacambaPage() {
   const router = useRouter();
-  const API_BASE = 'http://localhost:8080';
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingList, setIsLoadingList] = useState(true);
@@ -54,27 +53,15 @@ export default function AtualizarCacambaPage() {
       setError(null);
 
       try {
-        const token = getCookie('token');
-        if (!token) {
-          setError('Você não está autenticado. Faça login novamente.');
-          setCacambas([]);
-          return;
+        const json = await apiFetch<ApiResponse<CacambaApi[]>>(
+          "/api/Cacamba/ListarTodasCacambas",
+          { method: 'GET' }
+        );
+
+        if (!json.status) {
+          throw new Error(json.mensagem || 'Falha ao listar caçambas.');
         }
 
-        const res = await fetch(`${API_BASE}/api/Cacamba/ListarTodasCacambas`, {
-          headers: { Authorization: `Bearer ${token}` },
-          cache: 'no-store',
-        });
-
-        if (!res.ok) {
-          let msg = `Erro ao listar caçambas (HTTP ${res.status})`;
-          const body = await res.json().catch(() => null);
-          if (body?.mensagem) msg = body.mensagem;
-          if (body?.message) msg = body.message;
-          throw new Error(msg);
-        }
-
-        const json: ApiResponse<CacambaApi[]> = await res.json();
         const list = json.dados ?? [];
         setCacambas(list);
 
@@ -104,26 +91,15 @@ export default function AtualizarCacambaPage() {
       setError(null);
 
       try {
-        const token = getCookie('token');
-        if (!token) {
-          setError('Você não está autenticado. Faça login novamente.');
-          return;
+        const json = await apiFetch<ApiResponse<CacambaApi>>(
+          `/api/Cacamba/${Number(selectedId)}`,
+          { method: 'GET' }
+        );
+
+        if (!json.status) {
+          throw new Error(json.mensagem || 'Falha ao buscar caçamba.');
         }
 
-        const res = await fetch(`${API_BASE}/api/Cacamba/${Number(selectedId)}`, {
-          headers: { Authorization: `Bearer ${token}` },
-          cache: 'no-store',
-        });
-
-        if (!res.ok) {
-          let msg = `Erro ao buscar caçamba (HTTP ${res.status})`;
-          const body = await res.json().catch(() => null);
-          if (body?.mensagem) msg = body.mensagem;
-          if (body?.message) msg = body.message;
-          throw new Error(msg);
-        }
-
-        const json: ApiResponse<CacambaApi> = await res.json();
         const c = json.dados;
 
         setFormData(prev => ({
@@ -172,33 +148,26 @@ export default function AtualizarCacambaPage() {
     setError(null);
 
     try {
-      const token = getCookie('token');
-      if (!token) {
-        setError('Você não está autenticado. Faça login novamente.');
-        return;
-      }
-
       const payload: CacambaUpdatePayload = {
         codigo: formData.codigo.trim() || null,
         tamanho: Number.isNaN(Number(formData.tamanho)) ? null : Number(formData.tamanho),
         statusCacamba: Number.isNaN(Number(formData.statusCacamba)) ? null : Number(formData.statusCacamba),
       };
 
-      const res = await fetch(`${API_BASE}/api/Cacamba/AtualizarCacamba/${Number(selectedId)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      // Pode ser que o backend retorne 204 (sem JSON). Por isso o patch do apiFetch no final.
+      const json = await apiFetch<ApiResponse<any>>(
+        `/api/Cacamba/AtualizarCacamba/${Number(selectedId)}`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        }
+      );
 
-      if (!res.ok) {
-        let msg = `Erro ao atualizar (HTTP ${res.status})`;
-        const body = await res.json().catch(() => null);
-        if (body?.mensagem) msg = body.mensagem;
-        if (body?.message) msg = body.message;
-        throw new Error(msg);
+      // Se vier JSON padrão:
+      if (json && typeof json === "object" && "status" in json) {
+        if (!(json as any).status) {
+          throw new Error((json as any).mensagem || 'Falha ao atualizar caçamba.');
+        }
       }
 
       alert('Caçamba atualizada com sucesso!');

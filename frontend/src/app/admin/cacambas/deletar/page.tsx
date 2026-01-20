@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminDashboardSidebar } from "@/src/components/admin-dashboard-sidebar";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { Trash2, AlertTriangle } from "lucide-react";
 import Image from 'next/image';
-import { getCookie } from 'cookies-next';
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -13,7 +13,6 @@ type ApiResponse<T> = {
   dados: T;
 };
 
-// Modelo mais compatível com o backend atual
 type CacambaApi = {
   id: number;
   codigo: string;
@@ -21,16 +20,15 @@ type CacambaApi = {
 };
 
 type DumpsterCard = {
-  id: string;         // mantive string pra casar com seu estado atual
-  nome: string;       // vamos exibir o código aqui
-  tamanhoM3: string;  // "3" | "5" | "7"
-  imagem: string;     // placeholder
-  status?: string;    // opcional
-  preco?: string;     // opcional
+  id: string;
+  nome: string;
+  tamanhoM3: string;
+  imagem: string;
+  status?: string;
+  preco?: string;
 };
 
 function tamanhoEnumParaM3(tamanhoEnum: number): string {
-  // Enum do backend: 0=Pequeno, 1=Medio, 2=Grande
   if (tamanhoEnum === 0) return '3';
   if (tamanhoEnum === 1) return '5';
   if (tamanhoEnum === 2) return '7';
@@ -38,7 +36,6 @@ function tamanhoEnumParaM3(tamanhoEnum: number): string {
 }
 
 export default function DeletarCacambaPage() {
-  const API_BASE = useMemo(() => 'http://localhost:8080', []);
   const [dumpsters, setDumpsters] = useState<DumpsterCard[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,37 +63,18 @@ export default function DeletarCacambaPage() {
       setListError(null);
 
       try {
-        const token = getCookie('token');
-        if (!token) {
-          setListError('Você não está autenticado. Faça login novamente.');
-          setDumpsters([]);
-          return;
-        }
+        const json = await apiFetch<ApiResponse<CacambaApi[]>>(
+          "/api/Cacamba/ListarTodasCacambas",
+          { method: "GET" }
+        );
 
-        const res = await fetch(`${API_BASE}/api/Cacamba/ListarTodasCacambas`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          cache: 'no-store',
-        });
-
-        if (!res.ok) {
-          let msg = `Erro ao listar caçambas (HTTP ${res.status})`;
-          const body = await res.json().catch(() => null);
-          if (body?.mensagem) msg = body.mensagem;
-          if (body?.message) msg = body.message;
-          throw new Error(msg);
-        }
-
-        const json: ApiResponse<CacambaApi[]> = await res.json();
+        if (!json.status) throw new Error(json.mensagem || "Falha ao listar caçambas.");
 
         const mapped: DumpsterCard[] = (json.dados ?? []).map((c) => ({
           id: String(c.id),
           nome: c.codigo ? `Caçamba ${c.codigo}` : `Caçamba #${c.id}`,
           tamanhoM3: tamanhoEnumParaM3(c.tamanho),
           imagem: '/assets/cacamba.png',
-          // Como o backend atual não tem isso, deixo opcional:
           status: '—',
           preco: '—',
         }));
@@ -112,7 +90,7 @@ export default function DeletarCacambaPage() {
     };
 
     load();
-  }, [API_BASE]);
+  }, []);
 
   // 2) DELETE
   const handleDelete = async () => {
@@ -121,31 +99,21 @@ export default function DeletarCacambaPage() {
     setIsDeleting(true);
 
     try {
-      const token = getCookie('token');
-      if (!token) {
-        alert('Você não está autenticado. Faça login novamente.');
-        return;
-      }
-
       const idNum = Number(itemToDelete);
       if (Number.isNaN(idNum)) {
         alert('ID inválido para deletar.');
         return;
       }
 
-      const res = await fetch(`${API_BASE}/api/Cacamba/${idNum}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const json = await apiFetch<ApiResponse<any>>(
+        `/api/Cacamba/${idNum}`,
+        { method: "DELETE" }
+      );
 
-      if (!res.ok) {
-        let msg = `Erro ao deletar (HTTP ${res.status})`;
-        const body = await res.json().catch(() => null);
-        if (body?.mensagem) msg = body.mensagem;
-        if (body?.message) msg = body.message;
-        throw new Error(msg);
+      // Alguns deletes podem devolver body, outros podem ser 204.
+      // Se vier ApiResponse e status=false, respeita:
+      if (json && typeof json === "object" && "status" in json && (json as any).status === false) {
+        throw new Error((json as any).mensagem || "Falha ao deletar.");
       }
 
       setDumpsters((prev) => prev.filter((d) => d.id !== itemToDelete));

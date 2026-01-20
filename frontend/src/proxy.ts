@@ -12,30 +12,28 @@ const ROLE_CLAIM =
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const token = request.cookies.get("token")?.value;
+  const token = request.cookies.get("token")?.value; // hoje seu fluxo depende desse cookie :contentReference[oaicite:10]{index=10}
 
   const isAuthRoute =
     pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register");
 
   const isAdminRoute = pathname.startsWith("/admin");
-  const isUserRoute = pathname.startsWith("/usuario");
 
-  if (isAdminRoute && !token) {
+  // rotas “usuário”: /usuario e também /agendamentos
+  const isUserRoute =
+    pathname.startsWith("/usuario") || pathname.startsWith("/agendamentos");
+
+  if ((isAdminRoute || isUserRoute) && !token) {
     const url = new URL("/auth/login", request.url);
     url.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(url);
   }
 
-  if(!token && isUserRoute){
-    const url = new URL("/auth/login", request.url);
-    url.searchParams.set("returnTo", pathname);
-    return NextResponse.redirect(url);
-  }
-
-  if (!token && isAuthRoute){
+  if (!token && isAuthRoute) {
     return NextResponse.next();
-  } 
-  
+  }
+
+  // se já está logado e tenta ir pra /auth/*
   if (token && isAuthRoute) {
     try {
       const payload = jwtDecode<DotNetJwtPayload>(token);
@@ -47,6 +45,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // bloqueia usuário não-admin tentando /admin
   if (isAdminRoute && token) {
     try {
       const payload = jwtDecode<DotNetJwtPayload>(token);
@@ -63,5 +62,11 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/auth/login/:path*", "/auth/register/:path*", "/usuario/:path"],
+  matcher: [
+    "/admin/:path*",
+    "/usuario/:path*",
+    "/agendamentos/:path*",
+    "/auth/login/:path*",
+    "/auth/register/:path*",
+  ],
 };

@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCookie } from "cookies-next";
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { DashboardSidebar } from "@/src/components/dashboard-sidebar";
+import { apiFetch } from "@/src/lib/api";
 
 type ApiResponse<T> = {
   status: boolean;
@@ -28,7 +28,6 @@ function tamanhoEnumParaM3(t: number) {
 export default function CacambasDisponiveisClient() {
   const router = useRouter();
   const sp = useSearchParams();
-  const API_BASE = useMemo(() => "http://localhost:8080", []);
 
   const inicio = sp.get("inicio") ?? "";
   const fim = sp.get("fim") ?? "";
@@ -42,32 +41,17 @@ export default function CacambasDisponiveisClient() {
     setError(null);
 
     try {
-      // Se abriu sem query, volta pra escolher datas
       if (!inicio || !fim) {
         router.push("/agendamentos/novo");
         return;
       }
 
-      // token (remove Bearer se tiver)
-      const raw = getCookie("token");
-      const token = String(raw ?? "").replace(/^Bearer\s+/i, "").trim();
-      if (!token) throw new Error("Você não está autenticado. Faça login novamente.");
+      const json = await apiFetch<ApiResponse<CacambaApi[]>>(
+        `/api/Cacamba/CacambasDisponiveis?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`,
+        { method: "GET", cache: "no-store" }
+      );
 
-      const url = `${API_BASE}/api/Cacamba/CacambasDisponiveis?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`;
-      const res = await fetch(url, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.mensagem || body?.message || `Erro HTTP ${res.status}`);
-      }
-
-      const json: ApiResponse<CacambaApi[]> = await res.json();
       if (!json.status) throw new Error(json.mensagem || "Falha ao buscar caçambas.");
-
       setItems(json.dados ?? []);
     } catch (e: any) {
       console.error(e);

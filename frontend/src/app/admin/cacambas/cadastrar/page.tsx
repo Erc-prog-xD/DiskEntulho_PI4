@@ -2,10 +2,16 @@
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCookie } from 'cookies-next';
 import { DashboardHeader } from "@/src/components/dashboard-header";
 import { Save, Loader2 } from "lucide-react";
 import { AdminDashboardSidebar } from '@/src/components/admin-dashboard-sidebar';
+import { apiFetch } from "@/src/lib/api";
+
+type ApiResponse<T> = {
+  status: boolean;
+  mensagem: string;
+  dados: T;
+};
 
 type CadastrarCacambaPayload = {
   codigo: string;
@@ -33,9 +39,6 @@ export default function CadastrarCacambaPage() {
     setIsLoading(true);
 
     try {
-      const token = getCookie('token');
-
-      // Validações simples
       if (!formData.codigo.trim()) {
         alert("Informe o código da caçamba.");
         return;
@@ -46,20 +49,16 @@ export default function CadastrarCacambaPage() {
         tamanho: Number(formData.tamanho), // 0/1/2 (enum do backend)
       };
 
-      const API_URL = 'http://localhost:8080/api/Cacamba/CadastrarCacamba';
+      const json = await apiFetch<ApiResponse<any>>(
+        "/api/Cacamba/CadastrarCacamba",
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }
+      );
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({} as any));
-        throw new Error(errorData.mensagem || errorData.message || "Erro ao cadastrar caçamba");
+      if (!json.status) {
+        throw new Error(json.mensagem || "Erro ao cadastrar caçamba");
       }
 
       alert("Caçamba cadastrada com sucesso!");

@@ -1,4 +1,3 @@
-   | docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=1234" -p 1433:1433 --name sqlserver2022 -d mcr.microsoft.com/mssql/server:2022-latest 
 
 # 🚛 DiskEntulho - Sistema de Gerenciamento de Caçambas
 
@@ -9,7 +8,7 @@ Sistema completo para locação e gerenciamento de caçambas de entulho, com pai
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Backend:** .NET 8 (C#), Entity Framework Core
+- **Backend:** .NET 9 (C#), Entity Framework Core
 - **Frontend:** React (Next.js), Tailwind CSS
 - **Banco de Dados:** SQL Server (via Docker)
 - **Infraestrutura:** Docker & Docker Compose

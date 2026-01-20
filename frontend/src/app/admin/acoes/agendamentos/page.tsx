@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState, ChangeEvent } from 'react';
-import { getCookie } from 'cookies-next';
 import { AdminDashboardSidebar } from '@/src/components/admin-dashboard-sidebar';
 import { DashboardHeader } from '@/src/components/dashboard-header';
 import {
@@ -13,8 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-
-const API_BASE = 'http://localhost:8080';
+import { apiFetch } from '@/src/lib/api';
 
 // Enums (mantidos)
 const AGENDAMENTO_STATUS = [
@@ -124,9 +122,12 @@ function toQueryString(filters: Filters) {
   qs.set('SortBy', filters.sortBy);
   qs.set('SortDesc', String(filters.sortDesc));
 
-  if (filters.statusAgendamento !== '') qs.set('StatusAgendamento', String(filters.statusAgendamento));
-  if (filters.tipoPagamento !== '') qs.set('TipoPagamento', String(filters.tipoPagamento));
-  if (filters.statusPagamento !== '') qs.set('StatusPagamento', String(filters.statusPagamento));
+  if (filters.statusAgendamento !== '')
+    qs.set('StatusAgendamento', String(filters.statusAgendamento));
+  if (filters.tipoPagamento !== '')
+    qs.set('TipoPagamento', String(filters.tipoPagamento));
+  if (filters.statusPagamento !== '')
+    qs.set('StatusPagamento', String(filters.statusPagamento));
   if (filters.hasPagamento !== '') qs.set('HasPagamento', filters.hasPagamento);
 
   // ✅ Só 2 datas no UI, mas mapeando pros parâmetros do backend
@@ -226,21 +227,11 @@ export default function AgendamentosAdminPage() {
     setErrorMsg(null);
 
     try {
-      const token = getCookie('token');
-      if (!token) throw new Error('Token não encontrado. Faça login novamente.');
+      const json = await apiFetch<ApiResponse<PagedResponse<AgendamentoAdminItem>>>(
+        `/api/Admin/ListarTodosAgendamentos?${queryString}`,
+        { method: 'GET' }
+      );
 
-      const res = await fetch(`${API_BASE}/api/Admin/ListarTodosAgendamentos?${queryString}`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-        cache: 'no-store',
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.mensagem || body?.message || `Erro HTTP ${res.status}`);
-      }
-
-      const json: ApiResponse<PagedResponse<AgendamentoAdminItem>> = await res.json();
       if (!json.status || !json.dados) {
         throw new Error(json.mensagem || 'Falha ao listar agendamentos.');
       }
@@ -274,7 +265,7 @@ export default function AgendamentosAdminPage() {
       return;
     }
 
-    setFilters(prev => ({ ...prev, [name]: value, page: 1 }));
+    setFilters(prev => ({ ...prev, [name]: value as any, page: 1 }));
   };
 
   const clearFilters = () => {
@@ -370,7 +361,7 @@ export default function AgendamentosAdminPage() {
                 <span className="text-[11px] font-bold text-gray-400 uppercase">Status</span>
                 <select
                   name="statusAgendamento"
-                  value={filters.statusAgendamento}
+                  value={filters.statusAgendamento as any}
                   onChange={onInput}
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none"
                 >
@@ -385,7 +376,7 @@ export default function AgendamentosAdminPage() {
                 <span className="text-[11px] font-bold text-gray-400 uppercase">Tipo Pagamento</span>
                 <select
                   name="tipoPagamento"
-                  value={filters.tipoPagamento}
+                  value={filters.tipoPagamento as any}
                   onChange={onInput}
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none"
                 >
@@ -427,7 +418,7 @@ export default function AgendamentosAdminPage() {
                   <span className="text-[11px] font-bold text-gray-400 uppercase">Status Pagamento</span>
                   <select
                     name="statusPagamento"
-                    value={filters.statusPagamento}
+                    value={filters.statusPagamento as any}
                     onChange={onInput}
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none"
                   >
@@ -515,7 +506,7 @@ export default function AgendamentosAdminPage() {
             )}
           </div>
 
-          {/* ✅ TABELA COM MAIS TELA */}
+          {/* ✅ TABELA */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden min-h-[74vh]">
             {isLoading ? (
               <div className="flex-1 flex items-center justify-center text-gray-500 gap-2">

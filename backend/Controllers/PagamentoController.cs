@@ -25,17 +25,17 @@ namespace Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("CalcularValorAgendamento/{idAgendamento}")]
-        public async Task<ActionResult> CalcularValorAgendamento(int idAgendamento)
+        [HttpGet("CalcularValorAgendamento/{IdAgendamento:int}")]
+        public async Task<ActionResult> CalcularValorAgendamento(int IdAgendamento)
         {
-            var response = await _pagamentoService.CalcularValorAgendamento(idAgendamento);
+            var response = await _pagamentoService.CalcularValorAgendamento(IdAgendamento);
             return Ok(response);
         }
 
-        [HttpGet("PagamentoPorId/{idPagamento:int}")]
-        public async Task<ActionResult> PagamentoPorId(int idPagamento)
+        [HttpGet("PagamentoPorId/{IdPagamento:int}")]
+        public async Task<ActionResult> PagamentoPorId(int IdPagamento)
         {
-            var response = await _pagamentoService.ObterPagamentoPorId(idPagamento);
+            var response = await _pagamentoService.ObterPagamentoPorId(IdPagamento);
             return Ok(response);
         }
 

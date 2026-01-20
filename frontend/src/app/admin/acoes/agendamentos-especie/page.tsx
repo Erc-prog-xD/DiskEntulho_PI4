@@ -12,7 +12,7 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
-import { getCookie } from "cookies-next";
+import { apiFetch } from "@/src/lib/api";
 
 // ---------------- TIPAGENS (wrapper do backend) ----------------
 type ApiResponse<T> = {
@@ -128,8 +128,6 @@ const StatusBadge = ({ status }: { status: StatusLabel }) => {
 };
 
 export default function AgendamentosEspeciePage() {
-  const API_BASE = 'http://localhost:8080';
-
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
 
@@ -156,32 +154,11 @@ export default function AgendamentosEspeciePage() {
     setError(null);
 
     try {
-      const token = getCookie('token');
-      if (!token) {
-        setItems([]);
-        setTotal(0);
-        setError('Token não encontrado. Faça login novamente.');
-        return;
-      }
-
-      const res = await fetch(
-        `${API_BASE}/api/Admin/ListarAgendamentosEmEspecie?page=${p}&pageSize=${pageSize}`,
-        {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${token}` },
-          cache: 'no-store',
-        }
+      const json = await apiFetch<ApiResponse<PagedResponseDTO<AgendamentoAdminDTO>>>(
+        `/api/Admin/ListarAgendamentosEmEspecie?page=${p}&pageSize=${pageSize}`,
+        { method: 'GET' }
       );
 
-      if (!res.ok) {
-        let msg = `Erro ao buscar agendamentos (HTTP ${res.status})`;
-        const body = await res.json().catch(() => null);
-        if (body?.mensagem) msg = body.mensagem;
-        if (body?.message) msg = body.message;
-        throw new Error(msg);
-      }
-
-      const json: ApiResponse<PagedResponseDTO<AgendamentoAdminDTO>> = await res.json();
       const paged = json.dados;
 
       setItems(paged?.items ?? []);
@@ -213,29 +190,10 @@ export default function AgendamentosEspeciePage() {
       setActionLoadingId(idAgendamento);
       setError(null);
 
-      const token = getCookie('token');
-      if (!token) {
-        alert('Token não encontrado. Faça login novamente.');
-        return;
-      }
-
-      // Como o controller recebe (int idAgendamento, bool ConfirmarAgendamento),
-      // o jeito mais simples é mandar o bool via query string:
-      const url = `${API_BASE}/api/Admin/ConfirmarAgendamento/${idAgendamento}?ConfirmarAgendamento=${aprovar}`;
-
-      const res = await fetch(url, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-        cache: 'no-store',
-      });
-
-      if (!res.ok) {
-        let msg = `Erro ao atualizar agendamento (HTTP ${res.status})`;
-        const body = await res.json().catch(() => null);
-        if (body?.mensagem) msg = body.mensagem;
-        if (body?.message) msg = body.message;
-        throw new Error(msg);
-      }
+      await apiFetch<ApiResponse<any>>(
+        `/api/Admin/ConfirmarAgendamento/${idAgendamento}?ConfirmarAgendamento=${aprovar}`,
+        { method: 'PUT' }
+      );
 
       // fecha modal se era rejeição
       setIsRejectModalOpen(false);

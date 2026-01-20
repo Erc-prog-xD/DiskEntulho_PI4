@@ -31,7 +31,7 @@ namespace Backend.Services.PagamentoService
                     .Include(a => a.Pagamento)
                     .Include(a => a.Client)
                     .Include(a => a.Cacamba)
-                    .FirstOrDefaultAsync(a => a.Id == pagamento.idAgendamento && a.DeletionDate == null);
+                    .FirstOrDefaultAsync(a => a.Id == pagamento.IdAgendamento && a.DeletionDate == null);
 
                 if (agendamento == null || agendamento.Pagamento != null)
                 {
@@ -65,7 +65,7 @@ namespace Backend.Services.PagamentoService
                 }
                 
                 var dias = (agendamento.DataFinal.Date - agendamento.DataInicial.Date).Days;
-
+                
                 var valorTotal = preco.Valor * dias;
 
                 var novoPagamento = new Pagamento
@@ -124,7 +124,7 @@ namespace Backend.Services.PagamentoService
             }
         }
 
-        public async Task<Response<CalculoValorAgendamentoDTO>> CalcularValorAgendamento(int idAgendamento)
+        public async Task<Response<CalculoValorAgendamentoDTO>> CalcularValorAgendamento(int IdAgendamento)
         {
             var response = new Response<CalculoValorAgendamentoDTO>();
 
@@ -132,7 +132,7 @@ namespace Backend.Services.PagamentoService
             {
                 var agendamento = await _context.Agendamento
                     .Include(a => a.Cacamba)
-                    .FirstOrDefaultAsync(a => a.Id == idAgendamento && a.DeletionDate == null);
+                    .FirstOrDefaultAsync(a => a.Id == IdAgendamento && a.DeletionDate == null);
 
                 if (agendamento == null || agendamento.Cacamba == null)
                 {
@@ -181,14 +181,14 @@ namespace Backend.Services.PagamentoService
             }
         }
 
-       public async Task<Response<Pagamento?>> ObterPagamentoPorId(int idPagamento)
+       public async Task<Response<Pagamento?>> ObterPagamentoPorId(int IdPagamento)
         {
             var response = new Response<Pagamento?>();
 
             try
             {
                 var pagamento = await _context.Pagamento
-                    .FirstOrDefaultAsync(p => p.Id == idPagamento && p.DeletionDate == null);
+                    .FirstOrDefaultAsync(p => p.Id == IdPagamento && p.DeletionDate == null);
 
                 if (pagamento == null)
                 {
