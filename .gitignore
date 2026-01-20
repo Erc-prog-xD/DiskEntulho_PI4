@@ -10,11 +10,6 @@ build/
 [Bb]uild[Ll]og.*
 .env
 
-############################
-# Entity Framework
-############################
-Migrations/
-migrations/
 
 ############################
 # Usuário / IDE / Editor
