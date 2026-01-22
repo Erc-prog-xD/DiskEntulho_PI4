@@ -47,7 +47,7 @@ export function AdminDashboardSidebar() {
     { 
       icon: User, 
       label: "Perfil", 
-      href: "/perfil",
+      href: "/admin/perfil",
       active: false 
     }
   ]

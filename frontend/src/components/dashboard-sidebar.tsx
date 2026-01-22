@@ -32,12 +32,12 @@ export function DashboardSidebar() {
       icon: Calendar,
       label: "Agendamentos",
       children: [
-        { label: "Ver meus agendamentos", href: "/agendamentos", exact: true },
-        { label: "Novo agendamento", href: "/agendamentos/novo" },
+        { label: "Ver meus agendamentos", href: "/usuario/agendamentos", exact: true },
+        { label: "Novo agendamento", href: "/usuario/agendamentos/novo" },
       ],
     },
 
-    { icon: User, label: "Perfil", href: "/perfil" },
+    { icon: User, label: "Perfil", href: "/usuario/perfil" },
   ]), []);
 
   function handleLogout() {
