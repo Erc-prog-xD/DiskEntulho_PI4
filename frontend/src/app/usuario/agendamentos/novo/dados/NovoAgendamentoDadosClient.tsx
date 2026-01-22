@@ -54,10 +54,10 @@ export default function NovoAgendamentoDadosClient() {
 
   const voltarParaCacambas = () => {
     if (inicio && fim) {
-      router.push(`/agendamentos/cacambas?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`);
+      router.push(`/usuario/agendamentos/cacambas?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`);
       return;
     }
-    router.push("/agendamentos/novo");
+    router.push("/usuario/agendamentos/novo");
   };
 
   const submit = async () => {
@@ -68,7 +68,7 @@ export default function NovoAgendamentoDadosClient() {
     }
     if (!inicio || !fim) {
       alert("Datas não informadas. Volte e selecione as datas.");
-      router.push("/agendamentos/novo");
+      router.push("/usuario/agendamentos/novo");
       return;
     }
 
@@ -107,9 +107,9 @@ export default function NovoAgendamentoDadosClient() {
       const agId = json.dados?.id ?? json.dados?.Id ?? null;
 
       if (agId) {
-        router.push(`/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`);
+        router.push(`/usuario/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`);
       } else {
-        router.push("/agendamentos");
+        router.push("/usuario/agendamentos");
       }
     } catch (e: any) {
       console.error(e);

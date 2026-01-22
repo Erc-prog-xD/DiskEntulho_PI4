@@ -69,7 +69,7 @@ export default function CacambasDisponiveisClient() {
 
   const escolher = (cacambaId: number) => {
     router.push(
-      `/agendamentos/novo/dados?cacambaId=${encodeURIComponent(String(cacambaId))}&inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`
+      `/usuario/agendamentos/novo/dados?cacambaId=${encodeURIComponent(String(cacambaId))}&inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`
     );
   };
 

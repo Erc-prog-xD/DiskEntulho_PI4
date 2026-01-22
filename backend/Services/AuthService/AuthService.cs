@@ -19,18 +19,25 @@ namespace Backend.Services.AuthService
 
         public async Task<Response<ClientCriacaoDTO>> Registrar(ClientCriacaoDTO clientRegister)
         {
-            Response<ClientCriacaoDTO> response = new Response<ClientCriacaoDTO>();
+            Response<ClientCriacaoDTO> response = new();
+
             try
             {
                 if (!VerificaCpfJaExiste(clientRegister))
                 {
-                    response.Dados = null;
                     response.Status = false;
-                    response.Mensagem = "Cpf ja cadastrado!";
+                    response.Mensagem = "Cpf já cadastrado!";
                     return response;
                 }
 
-                _senhaInterface.CriarSenhaHash(clientRegister.Password, out byte[] senhaHash, out byte[] senhaSalt);
+                bool isFirstUser = !await _context.Client.AnyAsync();
+
+                _senhaInterface.CriarSenhaHash(
+                    clientRegister.Password,
+                    out byte[] senhaHash,
+                    out byte[] senhaSalt
+                );
+
                 Client client = new Client
                 {
                     Name = clientRegister.Name,
@@ -38,22 +45,25 @@ namespace Backend.Services.AuthService
                     Cpf = clientRegister.Cpf,
                     Phone = clientRegister.Phone,
                     PasswordHash = senhaHash,
-                    PasswordSalt = senhaSalt
+                    PasswordSalt = senhaSalt,
+                    isAdmin = isFirstUser ? true : false
                 };
-                _context.Add(client);
+
+                _context.Client.Add(client);
                 await _context.SaveChangesAsync();
 
-                response.Mensagem = "Client Cadastrado!";
-               
+                response.Status = true;
+                response.Mensagem = isFirstUser
+                    ? "Administrador criado com sucesso!"
+                    : "Cliente cadastrado com sucesso!";
             }
             catch (Exception ex)
             {
-                response.Dados = null;
                 response.Status = false;
                 response.Mensagem = ex.Message;
             }
-            return response;
 
+            return response;
         }
 
         public async Task<Response<string>> Login(ClientLoginDTO clientLogin)

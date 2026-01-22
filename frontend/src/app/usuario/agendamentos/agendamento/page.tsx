@@ -21,7 +21,7 @@ export default function NovoAgendamentoDatasPage() {
       return;
     }
 
-    router.push(`/agendamentos/cacambas?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`);
+    router.push(`/usuario/agendamentos/cacambas?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`);
   };
 
   return (

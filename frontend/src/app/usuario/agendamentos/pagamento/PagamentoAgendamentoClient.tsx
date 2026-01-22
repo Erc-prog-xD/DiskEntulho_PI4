@@ -93,7 +93,7 @@ export default function PagamentoAgendamentoClient() {
   // se carregou pagamento por id, guarda aqui
   const [pagamentoExistente, setPagamentoExistente] = useState<PagamentoDTO | null>(null);
 
-  const voltar = () => router.push("/agendamentos");
+  const voltar = () => router.push("/usuario/agendamentos");
 
   useEffect(() => {
     const run = async () => {

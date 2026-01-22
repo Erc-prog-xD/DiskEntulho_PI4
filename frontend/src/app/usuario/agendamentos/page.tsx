@@ -166,7 +166,7 @@ export default function AgendamentosPage() {
             </div>
 
             <button
-              onClick={() => router.push("/agendamentos/novo")}
+              onClick={() => router.push("/usuario/agendamentos/novo")}
               className="h-12 px-6 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
             >
               Novo agendamento
@@ -246,10 +246,10 @@ export default function AgendamentosPage() {
                         <button
                           onClick={() => {
                             if (pagamentoId) {
-                              router.push(`/agendamentos/pagamento?pagamentoId=${encodeURIComponent(String(pagamentoId))}`);
+                              router.push(`/usuario/agendamentos/pagamento?pagamentoId=${encodeURIComponent(String(pagamentoId))}`);
                               return;
                             }
-                            router.push(`/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`);
+                            router.push(`/usuario/agendamentos/pagamento?id=${encodeURIComponent(String(agId))}`);
                           }}
                           className="h-10 px-5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
                         >

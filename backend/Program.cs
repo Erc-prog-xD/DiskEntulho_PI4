@@ -216,7 +216,10 @@ using (var scope = app.Services.CreateScope())
     {
         db.Database.Migrate();
     }
+
+    await DbInitializer.InitializeAsync(db);
 }
+
 
 if (app.Environment.IsDevelopment())
 {

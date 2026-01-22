@@ -19,7 +19,7 @@ export function DashboardSidebar() {
   const isActiveExact = (href: string) => pathname === href;
   const isActiveWithChildren = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
-  const isInAgendamentos = pathname === "/agendamentos" || pathname.startsWith("/agendamentos/");
+  const isInAgendamentos = pathname === "/usuario/agendamentos" || pathname.startsWith("/usuario/agendamentos/");
 
   useEffect(() => {
     if (isInAgendamentos) setOpenAgendamentos(true);
