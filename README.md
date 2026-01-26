@@ -89,7 +89,7 @@ O sistema possui controle de acesso seguro via JWT. Novos usuários criam conta 
 
 | Cadastro | Login |
 |:---:|:---:|
-| ![Cadastro](./img/frontend/Auth_Cliente.PNG) | ![Login](./img/frontend/Auth2_Cliente.PNG) |
+| ![Cadastro](./img/frontend/Auth_Cliente.PNG) | ![Login](./img/frontend/Auth2.PNG) |
 
 ### 👮‍♂️ Área do Administrador
 Painel de gestão para controle total da operação.
