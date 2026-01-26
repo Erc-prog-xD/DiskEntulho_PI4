@@ -1,6 +1,10 @@
 
 # 🚛 DiskEntulho - Sistema de Gerenciamento de Caçambas
 
+![Status](https://img.shields.io/badge/Status-Concluído-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![Stack](https://img.shields.io/badge/Stack-.NET%209%20%2B%20Next.js-purple)
+
 Sistema completo para locação e gerenciamento de caçambas de entulho, com painel administrativo e integração de pagamentos.
 
 ![Logo do Projeto](./frontend/public/assets/disk-entulho.png)
@@ -30,21 +34,13 @@ O projeto está totalmente containerizado. Para rodar, basta executar:
    cd DiskEntulho_PI4 
    ```
 
-2. Suba os containers (Frontend, API e Banco):
+2. Suba os containers (Frontend e Banco):
 
    ```bash
    docker compose up -d --build
    ```
 
-   2.1. Acesse a aplicação:
-
-   - Frontend: http://localhost:3000
-   - Swagger (API): http://localhost:5036/swagger (ou a porta configurada no docker-compose)
-
-3. Ou suba só o container do Banco: (Alternativo)
-   ```bash
-   docker compose up -d sqlserver
-   ```
+3. Inicialize a API:
    3.1 Acesse a pasta da API:
    ```bash
    cd backend
@@ -57,8 +53,12 @@ O projeto está totalmente containerizado. Para rodar, basta executar:
    ```bash
    dotnet run
    ```
-   3.4 Acesse a aplicação:
+   ![Aplicações](./img/frontend/run.PNG)
+
+   3.4 Acesse as aplicações:
+   - Frontend: http://localhost:3000/auth/login
    - Swagger (API): http://localhost:8080/swagger
+   ![Aplicações](./img/frontend/aplicações.PNG)
 
 ## 📂 Estrutura do Projeto
 
@@ -84,6 +84,45 @@ DiskEntulho_PI4/
 └── 📄 README.md            # Documentação do Projeto
 ```
 
+## 📸 Visão Geral do Sistema
+O sistema possui controle de acesso seguro via JWT. Novos usuários criam conta como **Clientes**, enquanto o acesso **Admin** gerencia o negócio.
+
+| Cadastro | Login |
+|:---:|:---:|
+| ![Cadastro](./img/frontend/Auth_Cliente.PNG) | ![Login](./img/frontend/Auth2_Cliente.PNG) |
+
+### 👮‍♂️ Área do Administrador
+Painel de gestão para controle total da operação.
+
+**Dashboard e Gestão**
+Controle de agendamentos, aprovação de pagamentos manuais e gestão de inventário.
+![Admin Dashboard](./img/frontend/Auth4.PNG)
+
+**Cadastro de Inventário**
+Adição de novas caçambas e definição de preços por tamanho.
+![Cadastro Caçamba](./img/frontend/Cacamba.PNG)
+
+---
+
+### 👤 Área do Cliente
+O cliente tem um painel intuitivo para solicitar caçambas, ver histórico e realizar pagamentos.
+
+**1. Painel Principal**
+Visão geral de agendamentos e status da sessão.
+![Dashboard Cliente](./img/frontend/Auth1_Cliente.PNG)
+
+**2. Fluxo de Agendamento Inteligente**
+O cliente seleciona as datas e o sistema retorna **apenas caçambas disponíveis** no inventário para aquele período, evitando conflitos.
+![Datas](./img/frontend/Auth2_Cliente.PNG)
+![Seleção](./img/frontend/Auth3_Cliente.PNG)
+
+**3. Endereço e Pagamento**
+Cadastro do local de entrega e escolha da forma de pagamento (PIX Integrado ou Espécie).
+![Endereço](./img/frontend/Auth4_Cliente.PNG)
+![Pagamento](./img/frontend/Pagamento.PNG)
+
+---
+
 ## 🔐 Autenticação e Segurança
 
 A segurança do sistema é gerenciada via **JWT (JSON Web Token)**. O controle de acesso é baseado em *Roles* (perfis), garantindo que apenas usuários autorizados acessem endpoints sensíveis.
@@ -102,143 +141,114 @@ A segurança do sistema é gerenciada via **JWT (JSON Web Token)**. O controle d
 2. **Token:** O backend valida e retorna um token JWT (Bearer Token).
 3. **Requisições:** O Frontend armazena esse token e o envia no cabeçalho `Authorization` de cada requisição HTTP subsequente.
 
-### 🛣 Acessando Rotas Protegidas (Swagger)
+### 🛣 Acessando Rotas do Sistema e Autenticação
 
-Para testar endpoints com cadeado 🔒 no Swagger:
+O acesso ao sistema é protegido por autenticação JWT. O fluxo de entrada foi desenhado para ser intuitivo, com redirecionamento automático baseado no perfil do usuário (Cliente ou Admin).
 
-**Exemplo de JSON (Body):**
+### 1. Criar Conta (Cadastro)
+Novos usuários devem se registrar fornecendo dados pessoais. O sistema realiza validações de formato (CPF, Email) antes de enviar ao backend.
 
-```json
-{
-  "name": "João",
-  "cpf": "12345678900",
-  "email": "joao@gmail.com",
-  "phone": "88911223344",
-  "password": "123"
-}
-```
+![Tela de Cadastro](./img/frontend/Auth.PNG)
+*Ao clicar em cadastrar, o usuário recebe feedback visual imediato:*
+![Sucesso no Cadastro](./img/frontend/Auth1.PNG)
 
-1. Faça registro na rota `/api/Auth/Register`.
-![1Auth](./img/Auth1.png)
-2. Depois faça login na rota `/api/Auth/Login` e copie o `token` gerado.
-![2Auth](./img/Auth2.png)
-3. Clique no botão verde **Authorize** no topo da página.
-4. Insira o valor no formato: `Bearer SEU_TOKEN_COPIADO`.
-![3Auth](./img/Auth3.png)
-5. Clique em **Authorize**. Agora você tem acesso às rotas de Cliente.
+### 2. Login
+Para acessar, o usuário utiliza o **CPF** e a **Senha** cadastrados. O frontend gerencia o token de sessão de forma transparente.
 
-### 👑 Como Criar um Usuário Admin
+![Tela de Login](./img/frontend/Auth2.PNG)
 
-Por questões de segurança, todo novo usuário cadastrado via API ou Frontend nasce com o perfil **Cliente** (`isAdmin = 0`). Para elevar o nível de acesso para **Admin**, é necessário acesso direto ao Banco de Dados.
+### 3. Regra de Permissão Automática (Admin)
+O sistema verifica automaticamente se o banco de dados está vazio.
+1. O **primeiro usuário** a se cadastrar no sistema receberá automaticamente permissões de **Administrador** (`isAdmin = 1`).
+2. Todos os usuários cadastrados **posteriormente** serão criados com o perfil padrão de **Cliente** (`isAdmin = 0`).
 
-1. **Crie o usuário** normalmente pela rota `/api/Auth/Register`.
-2. **Conecte-se ao SQL Server** (via SSMS, Azure Data Studio ou DBeaver).
+> **Evidência no Banco de Dados:** Observe na imagem abaixo que a coluna `isAdmin` foi definida automaticamente como `1` (True) para o primeiro usuário, sem necessidade de intervenção manual.
+
+![Registro no Banco](./img/frontend/Auth3_BD.PNG)
+
+### 4. Acesso ao Painel
+Ao detectar que o usuário logado possui a claim de **Admin**, o sistema o redireciona para o **Dashboard Administrativo**, liberando as funcionalidades de gestão.
+
+![Dashboard Admin](./img/frontend/Auth4.PNG)
+
+### 🔧 Promover Outros Usuários (Opcional)
+
+Caso você precise transformar um **Cliente** comum em **Admin** posteriormente, será necessário acesso direto ao banco de dados:
+
+1. **Conecte-se ao SQL Server** (via SSMS, Azure Data Studio ou DBeaver).
    - **Server:** `localhost,1433`
    - **User:** `sa`
    - **Password:** `1234` (Conforme configurado no Docker)
      ![BD1](./img/BD1.png)
 
-3. **Execute o comando SQL** para alterar a permissão:
+2. **Execute o comando SQL** para alterar a permissão:
    ```sql
    -- Substitua 'seu@email.com' pelo email do usuário cadastrado
    UPDATE DiskEntulhoDB..Client SET isAdmin = 1 WHERE Email = 'seu@email.com';
    ```   
    ![BD2](./img/BD2.png)
 
-4. **Gere um novo Token:** Após a alteração, faça login novamente para gerar um token atualizado com as permissões de Admin.
-
 ## 🗑️ Gerenciamento de Caçambas
 
-Módulo responsável pelo inventário das caçambas. O sistema diferencia operações de consulta (disponíveis para Clientes) e operações de gestão (exclusivas para Admins).
+O sistema possui um controle de inventário robusto. Enquanto clientes apenas visualizam caçambas disponíveis para datas específicas, o **Administrador** possui acesso total para cadastrar e gerenciar o estoque físico.
 
-### 🔍 Verificar Disponibilidade (Inteligente)
+### ➕ Cadastro de Nova Caçamba
 
-O sistema possui uma lógica que cruza as datas solicitadas com os agendamentos existentes para retornar apenas caçambas livres.
+O fluxo de cadastro foi desenhado para ser simples e direto, validando os dados antes do envio para a API.
 
-- **Rota:** `GET /api/Cacamba/CacambasDisponiveis?inicio=AAAA-MM-DD&fim=AAAA-MM-DD`
-- **Permissão:** Cliente ou Admin
-- **Lógica:**
-  - O sistema verifica agendamentos com status *Criado*, *Processando* ou *Confirmado*.
-  - Retorna apenas caçambas que **não** conflitam com o intervalo de datas informado.
-  - Valida se a `dataInicial` é menor que a `dataFinal`.
+1. **Acesso:** No menu lateral, o Admin acessa **Caçambas > Cadastrar Caçamba**.
+2. **Preenchimento:**
+   - **Código:** Identificador único da caçamba (ex: `CAC-001`).
+   - **Tamanho:** Seleção via dropdown (Pequeno, Médio ou Grande).
+3. **Feedback:** Ao clicar em "Cadastrar", o sistema envia os dados e retorna um modal de sucesso imediato.
 
-### 🛠️ Gestão de Inventário (Exclusivo Admin)
+![Formulário de Cadastro](./img/frontend/Cacamba.PNG)
+![Confirmação de Sucesso](./img/frontend/Cacamba1.PNG)
 
-Apenas usuários com perfil **Admin** podem cadastrar, editar ou remover caçambas do sistema.
+### 💾 Persistência de Dados (Banco de Dados)
+
+Após o cadastro no Frontend, os dados são persistidos instantaneamente no SQL Server.
+> **Nota Técnica:** O tamanho "Pequeno" selecionado na interface é convertido automaticamente para o Enum `0` no banco de dados, mantendo a integridade da regra de negócio.
+
+![Registro no Banco de Dados](./img/frontend/Cacamba2_BD.PNG)
+
+### 🔌 Endpoints Relacionados (API)
+
+A gestão é realizada através do `CacambaController`, protegido pela role de Admin.
 
 - **Cadastrar:** `POST /api/Cacamba/CadastrarCacamba`
 - **Listar:** `GET /api/Cacamba/ListarTodasCacambas`
 - **Atualizar:** `PUT /api/Cacamba/AtualizarCacamba/{id}`
 - **Remover:** `DELETE /api/Cacamba/{id}` (Soft Delete - Apenas marca a data de exclusão)
 
-**Exemplo de JSON para Cadastro:**
-```json
-{
-   "codigo": "CA1",
-  "tamanho": 1
-}
-```
-Resposta esperada:
-![Cacamba](./img/Cacamba.png)
-![CacambaBD](./img/CacambaBD.png)
-
-## 💲 Gerenciamento de Preços
-
-O sistema permite que administradores definam o valor da locação baseando-se no tamanho da caçamba. Esta rota é protegida e valida estritamente os tamanhos permitidos pelo sistema.
-
-### 🏷️ Cadastrar Novo Preço
-
-Define quanto custa locar uma caçamba de determinado tamanho. O sistema impede a criação de preços duplicados para o mesmo tamanho.
-
-- **Rota:** `POST /api/Admin/CadastrarPreco`
-- **Permissão:** Exclusivo Admin (Requer Token)
-- **Regra de Tamanho:** O campo `tamanho` aceita apenas os números correspondentes ao Enum do sistema:
-  - `0` = Pequeno
-  - `1` = Médio
-  - `2` = Grande
-
-**Exemplo de JSON (Body):**
-```json
-{
-  "valor": 250.00,
-  "tamanho": 1
-}
-```
-Resposta esperada:
-![Preco](./img/Preco.png)
-![PrecoBD](./img/PrecoBD.PNG)
-
 ### 📝 Criar um Agendamento
 
-- **Pré Requisitos:** Para que seja possivel o agendamento é preciso que as Caçambas e os Preços já tenham sido cadastrados.
-- **Rota:** `POST /api/Agendamento/CadastrarAgendamento`
-- **Permissão:** Cliente ou Admin (Requer Token Bearer)
-- **Regras:**
-  - `DataInicial` e `DataFinal` devem ser datas futuras.
-  - `DataInicial` deve ser anterior à `DataFinal`.
-  - O `CacambaId` deve ser de uma caçamba existente no banco.
+O sistema oferece uma experiência fluida para o cliente, guiando-o desde a escolha da data até o pagamento, com validações em tempo real.
 
-**Exemplo de JSON (Body):**
-```json
-{
-   "coord_X": -23.550520,
-  "coord_Y": -46.633308,
-  "endereco": {
-     "rua": "Rua das Pedrinhas, 101",
-    "bairro": "Centro",
-    "cidade": "Crateús",
-    "estado": "CE",
-    "descricaoLocal": "Colocar na vaga de garagem",
-    "referencia": ""
-  },
-  "cacambaId": 1,
-  "dataInicial": "2026-01-04T23:37:16.541Z",
-  "dataFinal": "2026-02-04T23:37:16.541Z"
-}
-```
-Resposta esperada:
-![Agendamento](./img/Agendamento.png)
-![AgendamentoBD](./img/AgendamentoBD.PNG)
+### 1. Verificação de Disponibilidade
+O cliente seleciona o período de locação desejado. O backend processa as datas e retorna **apenas** as caçambas do inventário que não possuem conflito de agenda para aquele intervalo.
+
+![Seleção de Datas](./img/frontend/Auth2_Cliente.PNG)
+![Escolha de Caçamba](./img/frontend/Auth3_Cliente.PNG)
+
+### 2. Endereço de Entrega
+O usuário informa o local exato para a entrega da caçamba. Ao confirmar, o Frontend envia os dados para a API (`POST /api/Agendamento`), que valida as informações e cria o registro inicial.
+
+![Formulário de Endereço](./img/frontend/Auth4_Cliente.PNG)
+![Feedback de Sucesso](./img/frontend/Auth5_Cliente.PNG)
+
+### 3. Definição de Pagamento
+Imediatamente após o agendamento, o cliente define como deseja pagar.
+- **Espécie:** O status permanece "Processando" aguardando liberação do Admin.
+- **PIX/Cartão:** Integração automática via PagBank.
+
+![Tela de Pagamento](./img/frontend/Pagamento.PNG)
+
+### 4. Acompanhamento e Persistência
+O cliente é redirecionado para "Meus Agendamentos", onde vê o status atualizado em tempo real. Nos bastidores, garantimos a integridade relacional dos dados no SQL Server.
+
+![Painel do Cliente](./img/frontend/Auth6_Cliente_Pag1.PNG)
+![Persistência no Banco](./img/frontend/Auth6_Cliente_PagBD.PNG)
 
 ## 💳 Sistema de Pagamentos
 
@@ -276,43 +286,31 @@ PAGBANK_TOKEN=seu_token_de_sandbox
 PAGBANK_URL=[https://sandbox.api.pagseguro.com](https://sandbox.api.pagseguro.com) 
 ```
 
-## 💸 Fluxo de Pagamento e Aprovação
+## 💸 Fluxo de Pagamento e Aprovação (Espécie)
 
-O sistema implementa um fluxo de pagamento em duas etapas para modalidades que exigem verificação manual (como Pagamento em Espécie - Tipo 0).
+O sistema implementa um fluxo de segurança financeira. Pagamentos em espécie (dinheiro) não são aprovados automaticamente; eles entram em um estado de "Processando" até que um Administrador confirme o recebimento.
 
-### Passo 1: Solicitação de Pagamento (Cliente)
-O cliente informa como deseja pagar. Neste momento, o sistema calcula o valor final, vincula o pagamento ao agendamento e coloca o pedido em análise.
+### Passo 1: Solicitação de Pagamento 
+Ao finalizar o agendamento escolhendo "Espécie", o sistema registra o pedido com **Status 1 (Processando)**. O cliente é notificado que o pedido está sob análise.
 
-- **Rota:** `POST /api/Pagamento/AddPagamento`
-- **Permissão:** Cliente
-- **Comportamento:**
-  - O `StatusAgendamento` muda para **1 (Processando)**.
-  - O `StatusPagamento` é criado como **1 (Pendente)**.
-  - Uma notificação é gerada: *"Pagamento adicionado... agora estamos processando seu agendamento"*.
+![Tela de Pagamento](./img/frontend/Pagamento.PNG)
+> **No Banco de Dados:** O registro é criado, mas os status de Pagamento e Agendamento permanecem como `1` (Pendente/Processando).
+![DB Inicial](./img/frontend/Auth6_Cliente_PagBD.PNG)
 
-**Payload Exemplo:**
-```json
-{
-  "idAgendamento": 2,
-  "tipoPagamento": 0  // 0 = Espécie
-}
-```
-![Pagamento](./img/Pagamento.png)
-![PagamentoBD](./img/PagamentoBD.png)
+### Passo 2: Aprovação do Administrador
+O Admin acessa o menu **Ações > Confirmar Agendamentos**. Nesta tela exclusiva, ele visualiza todos os pedidos pendentes e pode **Confirmar** ou **Rejeitar** a locação.
 
-### Passo 2: Confirmação Financeira (Admin)
-Após receber o valor ou confirmar a transação, o Administrador deve liberar o agendamento manualmente.
+![Dashboard Admin](./img/frontend/Pagamento2_Admin.PNG)
 
-- **Rota:** `PUT /api/Admin/ConfirmarAgendamento/{idAgendamento}?ConfirmarAgendamento=true`
-- **Permissão:** Admin
-- **Comportamento:**
-  - O `StatusAgendamento` muda para 3 (Confirmado).
+### Passo 3: Confirmação e Atualização de Status
+Ao clicar em "Confirmar", o Frontend se comunica com a API, que executa a validação e retorna o feedback de sucesso.
 
-  - O `StatusPagamento` muda para 3 (Aprovado).
+![Modal de Sucesso](./img/frontend/Pagamento3_Admin.PNG)
 
-  - O cliente recebe a notificação final: "Agendamento e pagamento confirmado".
-    
-  ![Pagamento0](./img/Pagamento0.png)
-  ![Pagamento0BD](./img/Pagamento0BD.png)
+### Passo 4: Resultado Final (Persistência)
+Instantaneamente, o backend atualiza os registros no SQL Server:
+- **StatusPagamento:** Muda para `3` (Aprovado).
+- **StatusAgendamento:** Muda para `3` (Confirmado).
+- **Notificação:** O sistema gera automaticamente um aviso para o cliente: *"Agendamento e pagamento confirmado"*.
 
-Nota Técnica: O endpoint de confirmação está centralizado no AdminController, garantindo que apenas usuários com a role Admin possam validar transações financeiras manuais.
+![DB Final](./img/frontend/Pagamento3_AdminBD.PNG)
