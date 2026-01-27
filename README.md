@@ -18,7 +18,7 @@ Sistema completo para locação e gerenciamento de caçambas de entulho, com pai
 - **Frontend:** React (Next.js), Tailwind CSS
 - **Banco de Dados:** SQL Server (via Docker)
 - **Infraestrutura:** Docker & Docker Compose
-- **Pagamentos:** Integração com PagBank (PIX e Cartão)
+- **Pagamentos:** Integração com PagBank (Sandbox)
 
 ## ⚙️ Pré-requisitos
 
@@ -96,6 +96,8 @@ DiskEntulho_PI4/
 ```
 
 ## 📸 Visão Geral do Sistema
+
+### 🔐 Autenticação e Segurança
 O sistema possui controle de acesso seguro via JWT. Novos usuários criam conta como **Clientes**, enquanto o acesso **Admin** gerencia o negócio.
 
 | Cadastro | Login |
@@ -112,6 +114,10 @@ Controle de agendamentos, aprovação de pagamentos manuais e gestão de invent�
 **Cadastro de Inventário**
 Adição de novas caçambas e definição de preços por tamanho.
 ![Cadastro Caçamba](./img/frontend/Cacamba.PNG)
+
+**Aprovar pagamentos em espécie**
+Visualização de todos os pedidos pendentes, podendo **Confirmar** ou **Rejeitar** a locação.
+![Dashboard Admin](./img/frontend/Pagamento2_Admin.PNG)
 
 ---
 
@@ -132,27 +138,7 @@ Cadastro do local de entrega e escolha da forma de pagamento (PIX Integrado ou E
 ![Endereço](./img/frontend/Auth4_Cliente.PNG)
 ![Pagamento](./img/frontend/Pagamento.PNG)
 
----
-
-## 🔐 Autenticação e Segurança
-
-A segurança do sistema é gerenciada via **JWT (JSON Web Token)**. O controle de acesso é baseado em *Roles* (perfis), garantindo que apenas usuários autorizados acessem endpoints sensíveis.
-
-### 👤 Perfis de Acesso (Roles)
-
-- **Cliente:** Pode agendar caçambas, visualizar seu próprio histórico e realizar pagamentos (PIX/Cartão).
-- **Admin:** Possui privilégios elevados para:
-  - Aprovar pagamentos em espécie.
-  - Gerenciar cadastro de caçambas e preços.
-  - Visualizar todos os agendamentos do sistema.
-
-### ⚙ Como Funciona
-
-1. **Login:** O usuário envia o CPF e Senha para o endpoint de autenticação.
-2. **Token:** O backend valida e retorna um token JWT (Bearer Token).
-3. **Requisições:** O Frontend armazena esse token e o envia no cabeçalho `Authorization` de cada requisição HTTP subsequente.
-
-### 🛣 Acessando Rotas do Sistema e Autenticação
+## 🛣 Acessando Rotas do Sistema e Autenticação
 
 O acesso ao sistema é protegido por autenticação JWT. O fluxo de entrada foi desenhado para ser intuitivo, com redirecionamento automático baseado no perfil do usuário (Cliente ou Admin).
 
@@ -270,7 +256,7 @@ O projeto possui integração direta com a **API do PagBank (Sandbox)** para pro
 > - **`0` = Espécie:** Pagamento manual (Dinheiro), requer aprovação do Admin.
 > - **`1` = PIX:** Pagamento digital, integrado e aprovado automaticamente.
 
-### 💠 Métodos Suportados
+### 💠 Métodos Suportados:
 
 ### 1. 💸 Fluxo de Pagamento e Aprovação (Espécie)
 
@@ -280,7 +266,9 @@ O sistema implementa um fluxo de segurança financeira. Pagamentos em espécie (
 Ao finalizar o agendamento escolhendo "Espécie", o sistema registra o pedido com **Status 1 (Processando)**. O cliente é notificado que o pedido está sob análise.
 
 ![Tela de Pagamento](./img/frontend/Pagamento.PNG)
-> **No Banco de Dados:** O registro é criado, mas os status de Pagamento e Agendamento permanecem como `1` (Pendente/Processando).
+![Tela de Pagamento](./img/frontend/Pagamento1.PNG)
+
+> **No Banco de Dados:** O registro é criado, mas os StatusPagamento e StatusAgendamento ficam como `1` (Pendente/Processando).
 ![DB Inicial](./img/frontend/Auth6_Cliente_PagBD.PNG)
 
 #### Passo 2: Aprovação do Administrador
