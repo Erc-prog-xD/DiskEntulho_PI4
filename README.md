@@ -7,8 +7,10 @@
 
 Sistema completo para locação e gerenciamento de caçambas de entulho, com painel administrativo e integração de pagamentos.
 
-![Logo do Projeto](./frontend/public/assets/disk-entulho.png)
-![Swagger do Projeto](./img/Swagger.PNG)
+<div align="center">
+  <img src="./frontend/public/assets/disk-entulho.png" alt="Logo do Projeto">
+  <img src="./img/Swagger.PNG" alt="Swagger do Projeto">
+</div>
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -23,6 +25,14 @@ Sistema completo para locação e gerenciamento de caçambas de entulho, com pai
 - Docker e Docker Compose instalados.
 - Git instalado.
 - Arquivo .env
+
+## ⚙️ Configuração (Environment)
+Para que a integração funcione, o arquivo `.env` deve conter as credenciais do PagBank Sandbox:
+
+```env
+PAGBANK_TOKEN=seu_token_de_sandbox
+PAGBANK_URL=[https://sandbox.api.pagseguro.com](https://sandbox.api.pagseguro.com) 
+```
 
 ## 🛠️ Como Rodar o Projeto
 
@@ -58,6 +68,7 @@ O projeto está totalmente containerizado. Para rodar, basta executar:
    3.4 Acesse as aplicações:
    - Frontend: http://localhost:3000/auth/login
    - Swagger (API): http://localhost:8080/swagger
+   
    ![Aplicações](./img/frontend/aplicações.PNG)
 
 ## 📂 Estrutura do Projeto
@@ -221,7 +232,7 @@ A gestão é realizada através do `CacambaController`, protegido pela role de A
 - **Atualizar:** `PUT /api/Cacamba/AtualizarCacamba/{id}`
 - **Remover:** `DELETE /api/Cacamba/{id}` (Soft Delete - Apenas marca a data de exclusão)
 
-### 📝 Criar um Agendamento
+## 📝 Criar um Agendamento
 
 O sistema oferece uma experiência fluida para o cliente, guiando-o desde a escolha da data até o pagamento, com validações em tempo real.
 
@@ -254,63 +265,61 @@ O cliente é redirecionado para "Meus Agendamentos", onde vê o status atualizad
 
 O projeto possui integração direta com a **API do PagBank (Sandbox)** para processamento de pagamentos digitais, além de suportar pagamentos manuais.
 
+> **📝 Nota Técnica (Enum):**
+> No banco de dados, o campo `TipoPagamento` segue o seguinte mapeamento:
+> - **`0` = Espécie:** Pagamento manual (Dinheiro), requer aprovação do Admin.
+> - **`1` = PIX:** Pagamento digital, integrado e aprovado automaticamente.
+
 ### 💠 Métodos Suportados
 
-#### 1. PIX (Integrado)
-- **Fluxo:** Ao finalizar o agendamento, o backend se comunica com o PagBank.
-- **Retorno:** É gerado um **QR Code** (Copia e Cola) dinâmico, salvo no banco na coluna `PagBankQrCode`.
-- **Status:** O sistema aguarda a confirmação do pagamento (Webhooks ou verificação futura).
-
-#### 2. Em Espécie (Manual)
-- **Fluxo:** O cliente escolhe pagar na entrega/retirada.
-- **Status Inicial:** O agendamento fica travado como `Processando`.
-- **Aprovação:** É necessário que um **Admin** libere manualmente através do sistema.
-
-### 👮‍♂️ Área do Admin (Financeiro)
-
-Para pagamentos em espécie, o administrador deve confirmar o recebimento para liberar o agendamento.
-
-- **Endpoint de Aprovação:** `PUT /api/Pagamento/AprovarPagamentoEspecie/{id}`
-- **Permissão:** Exclusivo Admin.
-- **Lógica:**
-  1. Busca o agendamento pelo ID.
-  2. Verifica se o tipo de pagamento é realmente "Espécie".
-  3. Altera o status do pagamento para `Aprovado`.
-  4. Altera o status do agendamento para `Confirmado`.
-
-### ⚙️ Configuração (Environment)
-Para que a integração funcione, o arquivo `.env` deve conter as credenciais do PagBank Sandbox:
-
-```env
-PAGBANK_TOKEN=seu_token_de_sandbox
-PAGBANK_URL=[https://sandbox.api.pagseguro.com](https://sandbox.api.pagseguro.com) 
-```
-
-## 💸 Fluxo de Pagamento e Aprovação (Espécie)
+### 1. 💸 Fluxo de Pagamento e Aprovação (Espécie)
 
 O sistema implementa um fluxo de segurança financeira. Pagamentos em espécie (dinheiro) não são aprovados automaticamente; eles entram em um estado de "Processando" até que um Administrador confirme o recebimento.
 
-### Passo 1: Solicitação de Pagamento 
+#### Passo 1: Solicitação de Pagamento 
 Ao finalizar o agendamento escolhendo "Espécie", o sistema registra o pedido com **Status 1 (Processando)**. O cliente é notificado que o pedido está sob análise.
 
 ![Tela de Pagamento](./img/frontend/Pagamento.PNG)
 > **No Banco de Dados:** O registro é criado, mas os status de Pagamento e Agendamento permanecem como `1` (Pendente/Processando).
 ![DB Inicial](./img/frontend/Auth6_Cliente_PagBD.PNG)
 
-### Passo 2: Aprovação do Administrador
+#### Passo 2: Aprovação do Administrador
 O Admin acessa o menu **Ações > Confirmar Agendamentos**. Nesta tela exclusiva, ele visualiza todos os pedidos pendentes e pode **Confirmar** ou **Rejeitar** a locação.
 
 ![Dashboard Admin](./img/frontend/Pagamento2_Admin.PNG)
 
-### Passo 3: Confirmação e Atualização de Status
+#### Passo 3: Confirmação e Atualização de Status
 Ao clicar em "Confirmar", o Frontend se comunica com a API, que executa a validação e retorna o feedback de sucesso.
 
 ![Modal de Sucesso](./img/frontend/Pagamento3_Admin.PNG)
 
-### Passo 4: Resultado Final (Persistência)
+#### Passo 4: Resultado Final (Persistência)
 Instantaneamente, o backend atualiza os registros no SQL Server:
 - **StatusPagamento:** Muda para `3` (Aprovado).
 - **StatusAgendamento:** Muda para `3` (Confirmado).
 - **Notificação:** O sistema gera automaticamente um aviso para o cliente: *"Agendamento e pagamento confirmado"*.
 
 ![DB Final](./img/frontend/Pagamento3_AdminBD.PNG)
+
+### 2. 💠 Fluxo de Pagamento via PIX (Automático)
+
+Diferente do pagamento em espécie, o fluxo via PIX é totalmente integrado. O sistema se comunica diretamente com a API do PagBank para gerar cobranças dinâmicas e processar a aprovação sem intervenção humana.
+
+#### 1. Seleção do Método
+No checkout, o cliente seleciona a opção **Pix**. O sistema calcula o valor total e prepara a requisição segura para o gateway de pagamento.
+
+![Seleção Pix](./img/frontend/Pagamento_PIX.PNG)
+
+#### 2. Geração do QR Code
+O backend envia os dados para o PagBank, que retorna um **QR Code** (Link). O sistema exibe o link "Abrir" para o usuário realizar o pagamento instantâneo.
+
+![QR Code Gerado](./img/frontend/Pagamento_PIX1.PNG)
+
+#### 3. Processamento e Persistência
+Após a confirmação (Simulada no Sandbox), o sistema atualiza os registros automaticamente no SQL Server:
+- **StatusPagamento:** Atualiza para `3` (Aprovado).
+- **StatusAgendamento:** Atualiza para `3` (Confirmado).
+- **Auditoria:** Os campos `PagBankOrderId` e `PagBankQrCode` são salvos para rastreio.
+- **Notificação:** O sistema envia um aviso automático: *"Verificamos o pagamento e ele foi aprovado!"*.
+
+![Banco de Dados Pix](./img/frontend/Pagamento_PIX2_AdminBD.PNG)
