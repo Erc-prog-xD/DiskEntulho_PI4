@@ -10,7 +10,7 @@ namespace Backend.Models
         public required string Phone { get; set; }
         public required byte[] PasswordHash { get; set; }
         public required byte[] PasswordSalt { get; set; }
-        public bool isAdmin { get; set; } = false;
+        public bool IsAdmin { get; set; } = false;
         public DateTime CreationDate { get; set; } = DateTime.Now;
         public DateTime? DeletionDate { get; set; } = null;
 

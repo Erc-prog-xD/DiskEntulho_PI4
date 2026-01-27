@@ -7,6 +7,6 @@ namespace Backend.Dto
         public required string Cpf { get; set; }
         public required string Email { get; set; }
         public required string Phone { get; set; }
-        public bool isAdmin { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

@@ -211,13 +211,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var senhaService = scope.ServiceProvider.GetRequiredService<ISenhaInterface>();
 
-    if ((await db.Database.GetPendingMigrationsAsync()).Any())
-    {
-        db.Database.Migrate();
-    }
-
-    await DbInitializer.InitializeAsync(db);
+    await db.Database.MigrateAsync();
+    await DbInitializer.InitializeAsync(db, senhaService);
 }
 
 

@@ -26,7 +26,7 @@ namespace Backend.Services.UsuarioService
                 Cpf = client.Cpf,
                 Email = client.Email,
                 Phone = client.Phone,
-                isAdmin = client.isAdmin
+                IsAdmin = client.IsAdmin
             };
         }
 

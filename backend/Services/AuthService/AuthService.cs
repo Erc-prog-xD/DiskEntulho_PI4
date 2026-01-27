@@ -30,7 +30,6 @@ namespace Backend.Services.AuthService
                     return response;
                 }
 
-                bool isFirstUser = !await _context.Client.AnyAsync();
 
                 _senhaInterface.CriarSenhaHash(
                     clientRegister.Password,
@@ -46,16 +45,14 @@ namespace Backend.Services.AuthService
                     Phone = clientRegister.Phone,
                     PasswordHash = senhaHash,
                     PasswordSalt = senhaSalt,
-                    isAdmin = isFirstUser ? true : false
+                    IsAdmin = false
                 };
 
                 _context.Client.Add(client);
                 await _context.SaveChangesAsync();
 
                 response.Status = true;
-                response.Mensagem = isFirstUser
-                    ? "Administrador criado com sucesso!"
-                    : "Cliente cadastrado com sucesso!";
+                response.Mensagem = "Cliente cadastrado com sucesso!";
             }
             catch (Exception ex)
             {

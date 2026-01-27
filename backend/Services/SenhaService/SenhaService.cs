@@ -38,7 +38,7 @@ namespace Backend.Services.SenhaService
                     new Claim(ClaimTypes.Name, client.Name ?? ""),
                     new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()),
                     new Claim("Cpf", client.Cpf ?? ""),
-                    new Claim(ClaimTypes.Role, client.isAdmin ? "Admin" : "Client")
+                    new Claim(ClaimTypes.Role, client.IsAdmin ? "Admin" : "Client")
                 };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value ?? ""));

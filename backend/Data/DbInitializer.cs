@@ -1,26 +1,49 @@
 using Backend.Data;
 using Backend.Enum;
 using Backend.Models;
+using Backend.Services.SenhaService;
 using Microsoft.EntityFrameworkCore;
 
 public static class DbInitializer
 {
-    public static async Task InitializeAsync(AppDbContext context)
+    public static async Task InitializeAsync(
+        AppDbContext context,
+        ISenhaInterface senhaService)
     {
-        // se já tiver dados, não insere de novo
-        if (await context.Preco.AnyAsync())
-            return;
-        
-        var precos = new List<Preco>
+        // 🔹 Admin
+        if (!await context.Client.AnyAsync(u => u.IsAdmin))
         {
-            new() { Tamanho = CacambaTamanhoEnum.Pequeno, Valor = 2 },
-            new() { Tamanho = CacambaTamanhoEnum.Medio, Valor = 4 },
-            new() { Tamanho = CacambaTamanhoEnum.Grande, Valor = 6 },
-        };
+            senhaService.CriarSenhaHash("admin", out byte[] hash, out byte[] salt);
 
-        context.Preco.AddRange(precos);
+            var admin = new Client
+            {
+                Name = "admin",
+                Cpf = "00000000000",
+                Email = "admin@admin.com",
+                Phone = "(00)0000-0000",
+                IsAdmin = true,
+                PasswordHash = hash,
+                PasswordSalt = salt
+            };
+
+            context.Client.Add(admin);
+        }
+
+        // 🔹 Preços
+        if (!await context.Preco.AnyAsync())
+        {
+            var precos = new List<Preco>
+            {
+                new() { Tamanho = CacambaTamanhoEnum.Pequeno, Valor = 2 },
+                new() { Tamanho = CacambaTamanhoEnum.Medio, Valor = 4 },
+                new() { Tamanho = CacambaTamanhoEnum.Grande, Valor = 6 },
+            };
+
+            context.Preco.AddRange(precos);
+        }
+
         await context.SaveChangesAsync();
-
-        Console.WriteLine("✔ Seed de preços executado");
+        Console.WriteLine("✔ Seed executado com sucesso");
     }
 }
+
