@@ -7,6 +7,10 @@ import { DashboardHeader } from "@/src/components/dashboard-header";
 import { Loader2, PackageSearch } from "lucide-react";
 import { apiFetch } from "@/src/lib/api";
 
+/* =========================
+   Tipos
+========================= */
+
 type ApiResponse<T> = {
   status: boolean;
   mensagem: string;
@@ -20,8 +24,17 @@ type CacambaApi = {
   statusCacamba: number; // enum: 0/1
 };
 
+type PrecoApi = {
+  id: number;
+  valor: number;
+  tamanho: number; // enum
+};
+
+/* =========================
+   Helpers
+========================= */
+
 function tamanhoEnumParaM3(tamanhoEnum: number): string {
-  // 0=Pequeno, 1=Medio, 2=Grande
   if (tamanhoEnum === 0) return '3';
   if (tamanhoEnum === 1) return '5';
   if (tamanhoEnum === 2) return '7';
@@ -29,20 +42,35 @@ function tamanhoEnumParaM3(tamanhoEnum: number): string {
 }
 
 function statusParaTexto(status: number): { label: string; className: string } {
-  // 0=Indisponivel, 1=Disponivel
-  if (status === 1) return { label: 'Disponível', className: 'text-green-600' };
+  if (status === 1) {
+    return { label: 'Disponível', className: 'text-green-600' };
+  }
   return { label: 'Indisponível', className: 'text-red-500' };
 }
 
+function formatarPreco(valor?: number) {
+  if (valor == null) return '—';
+  return valor.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+}
+
+/* =========================
+   Página
+========================= */
+
 export default function ListarCacambasPage() {
   const [cacambas, setCacambas] = useState<CacambaApi[]>([]);
+  const [precos, setPrecos] = useState<Record<number, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadCacambas = async () => {
-    setIsLoading(true);
-    setError(null);
+  /* =========================
+     Load Caçambas
+  ========================= */
 
+  const loadCacambas = async () => {
     try {
       const json = await apiFetch<ApiResponse<CacambaApi[]>>(
         '/api/Cacamba/ListarTodasCacambas',
@@ -52,17 +80,51 @@ export default function ListarCacambasPage() {
       setCacambas(json.dados ?? []);
     } catch (e: any) {
       console.error(e);
-      setError(e?.message ?? 'Erro ao carregar lista.');
+      setError(e?.message ?? 'Erro ao carregar caçambas.');
       setCacambas([]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  /* =========================
+     Load Preços
+  ========================= */
+
+  const loadPrecos = async () => {
+    try {
+      const json = await apiFetch<ApiResponse<PrecoApi[]>>(
+        '/api/Preco/Listar',
+        { method: 'GET' }
+      );
+
+      const mapa: Record<number, number> = {};
+      (json.dados ?? []).forEach(p => {
+        mapa[p.tamanho] = p.valor;
+      });
+
+      setPrecos(mapa);
+    } catch (e) {
+      console.error('Erro ao carregar preços', e);
+      setPrecos({});
+    }
+  };
+
+  /* =========================
+     Init
+  ========================= */
+
   useEffect(() => {
-    loadCacambas();
+    setIsLoading(true);
+    setError(null);
+
+    Promise.all([loadCacambas(), loadPrecos()])
+      .finally(() => setIsLoading(false));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* =========================
+     Render
+  ========================= */
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
@@ -76,14 +138,20 @@ export default function ListarCacambasPage() {
         <main className="flex-1 flex flex-col p-10 min-h-0 overflow-y-auto">
           <header className="mb-8 flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Lista de Caçambas</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Lista de Caçambas
+              </h1>
               <p className="text-lg text-gray-500">
                 Visualize todas as caçambas cadastradas no sistema.
               </p>
             </div>
 
             <button
-              onClick={loadCacambas}
+              onClick={() => {
+                setIsLoading(true);
+                Promise.all([loadCacambas(), loadPrecos()])
+                  .finally(() => setIsLoading(false));
+              }}
               className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold px-5 py-3 rounded-xl transition-all"
               disabled={isLoading}
             >
@@ -105,7 +173,9 @@ export default function ListarCacambasPage() {
           {!isLoading && !error && cacambas.length === 0 && (
             <div className="flex flex-col items-center justify-center h-64 text-gray-400">
               <PackageSearch className="w-16 h-16 mb-4 opacity-20" />
-              <p className="text-xl font-medium">Nenhuma caçamba encontrada.</p>
+              <p className="text-xl font-medium">
+                Nenhuma caçamba encontrada.
+              </p>
             </div>
           )}
 
@@ -114,6 +184,7 @@ export default function ListarCacambasPage() {
               {cacambas.map((c) => {
                 const tam = tamanhoEnumParaM3(c.tamanho);
                 const st = statusParaTexto(c.statusCacamba);
+                const preco = precos[c.tamanho];
 
                 return (
                   <div
@@ -142,19 +213,25 @@ export default function ListarCacambasPage() {
                           <p className={`text-sm font-medium ${st.className}`}>
                             {st.label}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">ID: {c.id}</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            ID: {c.id}
+                          </p>
                         </div>
 
-                        {/* Backend atual não tem preço, então deixo placeholder */}
                         <div className="text-right">
-                          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Diária</p>
-                          <p className="font-bold text-blue-600">—</p>
+                          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                            Diária
+                          </p>
+                          <p className="font-bold text-blue-600">
+                            {formatarPreco(preco)}
+                          </p>
                         </div>
                       </div>
 
-                      {/* Se quiser, aqui você pode colocar botões de Editar/Deletar */}
                       <button
-                        onClick={() => navigator.clipboard.writeText(String(c.id))}
+                        onClick={() =>
+                          navigator.clipboard.writeText(String(c.id))
+                        }
                         className="mt-auto w-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white py-3 rounded-lg font-bold transition-all duration-200"
                       >
                         Copiar ID
