@@ -18,7 +18,7 @@ public static class DbInitializer
             var admin = new Client
             {
                 Name = "admin",
-                Cpf = "00000000000",
+                Cpf = "54838493029",
                 Email = "admin@admin.com",
                 Phone = "(00)0000-0000",
                 IsAdmin = true,
