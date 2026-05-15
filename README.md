@@ -26,14 +26,6 @@ Sistema completo para locação e gerenciamento de caçambas de entulho, com pai
 - Git instalado.
 - Arquivo .env
 
-## ⚙️ Configuração (Environment)
-Para que a integração funcione, o arquivo `.env` deve conter as credenciais do PagBank Sandbox:
-
-```env
-PAGBANK_TOKEN=seu_token_de_sandbox
-PAGBANK_URL=[https://sandbox.api.pagseguro.com](https://sandbox.api.pagseguro.com) 
-```
-
 ## 🛠️ Como Rodar o Projeto
 
 O projeto está totalmente containerizado. Para rodar, basta executar:
